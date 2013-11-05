@@ -72,4 +72,11 @@ Public Class SaveLoad
     Private Sub tick_tick() Handles tick.Tick
         BringToFront()
     End Sub
+
+    Private Sub btnCancel_Click(sender As System.Object, e As System.EventArgs) Handles btnCancel.Click
+        Screen.Pause_Click(Me, New EventArgs)
+        Screen.Enabled = True
+        Screen.BringToFront()
+        Close()
+    End Sub
 End Class

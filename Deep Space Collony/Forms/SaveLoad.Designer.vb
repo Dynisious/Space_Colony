@@ -114,6 +114,7 @@ Partial Class SaveLoad
         Me.Controls.Add(Me.Panel1)
         Me.Controls.Add(Me.btnSaveLoad)
         Me.Controls.Add(Me.btnCancel)
+        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
         Me.Name = "SaveLoad"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "SaveLoad"
