@@ -1,6 +1,7 @@
 ﻿Imports System.Runtime.Serialization.Formatters.Binary
 
 Public Class SaveLoad
+    Dim WithEvents tick As New Timer With {.Enabled = True, .Interval = 100}
     Public Enum FileModes
         Saving
         Loading
@@ -66,5 +67,9 @@ Public Class SaveLoad
             End If
             Close()
         End If
+    End Sub
+
+    Private Sub tick_tick() Handles tick.Tick
+        BringToFront()
     End Sub
 End Class

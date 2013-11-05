@@ -1,4 +1,5 @@
 ﻿Public Class AddingShipsStep1
+    Private WithEvents tick As New Timer With {.Enabled = True, .Interval = 100}
     Public P As sector
     Public Fleets() As fleet 'The fleets being interacted with
     Public btns(0) As btnFleet 'The buttons
@@ -71,6 +72,8 @@
                 P.Add_Fleet(New fleet(P, New playerFighter(), P.Position, Galaxy.Allegence.Friendly))
                 Dim Temp As New AddingShipsStep2(P.Fleets(UBound(P.Fleets)), P)
                 Close()
+            Else
+                My.Computer.Audio.PlaySystemSound(Media.SystemSounds.Beep)
             End If
         Else
             Discription.Text =
@@ -83,5 +86,9 @@
         P.P.P.Enabled = True
         P.P.P.BringToFront()
         Close()
+    End Sub
+
+    Private Sub tick_tick() Handles tick.Tick
+        BringToFront()
     End Sub
 End Class

@@ -1,4 +1,5 @@
 ﻿Public Class AddingShipsStep2
+    Private WithEvents tick As New Timer With {.Enabled = True, .Interval = 100}
     Public P As sector
     Public Fleet As fleet
     Public ResourceCost As Integer
@@ -17,8 +18,8 @@
             "Bomber: " + CStr(bomber.Bomber_Costs(Galaxy.Produce.Resource)) +
             "/" + CStr(bomber.Bomber_Costs(Galaxy.Produce.Gas))
         lblFrigates.Text =
-            "Frigate: " + CStr(Frigate.Frigate_Costs(Galaxy.Produce.Resource)) +
-            "/" + CStr(Frigate.Frigate_Costs(Galaxy.Produce.Gas))
+            "Frigate: " + CStr(frigate.Frigate_Costs(Galaxy.Produce.Resource)) +
+            "/" + CStr(frigate.Frigate_Costs(Galaxy.Produce.Gas))
         lblDestroyers.Text =
             "Destroyer: " + CStr(destroyer.Destroyer_Costs(Galaxy.Produce.Resource)) +
             "/" + CStr(destroyer.Destroyer_Costs(Galaxy.Produce.Gas))
@@ -38,7 +39,7 @@
     Private Sub UpdateCosts() Handles T.Tick
         ResourceCost = (NumFighters.Value * fighter.Fighter_Costs(Galaxy.Produce.Resource)) +
             (NumBombers.Value * bomber.Bomber_Costs(Galaxy.Produce.Resource)) +
-            (NumFrigates.Value * Frigate.Frigate_Costs(Galaxy.Produce.Resource)) +
+            (NumFrigates.Value * frigate.Frigate_Costs(Galaxy.Produce.Resource)) +
             (NumDestroyers.Value * destroyer.Destroyer_Costs(Galaxy.Produce.Resource)) +
             (NumCruisers.Value * cruiser.Cruiser_Costs(Galaxy.Produce.Resource)) +
             (NumDreadnoughts.Value * dreadnought.Dreadnought_Costs(Galaxy.Produce.Resource))
@@ -124,7 +125,11 @@
                     Dim f As New MouseEventArgs(Windows.Forms.MouseButtons.Left, 1, 0, 0, 0)
                     P.Clicked(f)
                     Close()
+                Else
+                    My.Computer.Audio.PlaySystemSound(Media.SystemSounds.Beep)
                 End If
+            Else
+                My.Computer.Audio.PlaySystemSound(Media.SystemSounds.Beep)
             End If
         Else
             Close()
@@ -132,9 +137,12 @@
     End Sub
 
     Private Sub Cancel_Click(sender As System.Object, e As System.EventArgs) Handles Cancel.Click
-        p.p.p.Enabled = True
-        p.p.p.BringToFront()
+        P.P.P.Enabled = True
+        P.P.P.BringToFront()
         Close()
     End Sub
 
+    Private Sub tick_tick() Handles tick.Tick
+        BringToFront()
+    End Sub
 End Class

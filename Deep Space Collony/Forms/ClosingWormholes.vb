@@ -1,4 +1,5 @@
 ﻿Public Class ClosingWormholes
+    Private WithEvents tick As New Timer With {.Enabled = True, .Interval = 100}
     Public Wormholes() As wormhole 'The fleets being interacted with
     Public btns(0) As btnHole 'The buttons
     Private Shared ReadOnly Alpha As New Dictionary(Of Integer, String) From {
@@ -69,6 +70,10 @@
         Screen.Enabled = True
         Screen.BringToFront()
         Close()
+    End Sub
+
+    Private Sub tick_tick() Handles tick.Tick
+        BringToFront()
     End Sub
 
 End Class
