@@ -27,14 +27,12 @@
 
     Public Sub btnNewGame_Click(sender As System.Object, e As System.EventArgs) Handles btnNewGame.Click
         Screen.CreateControl()
-        Screen.Scale(New SizeF(NewScale, NewScale))
         Close()
     End Sub
 
     Private Sub btnTutorial_Click(sender As System.Object, e As System.EventArgs) Handles btnTutorial.Click
         Tutorial = True
         Screen.CreateControl()
-        Screen.Scale(New SizeF(NewScale, NewScale))
         tutorialWindow.CreateControl()
         My.Computer.Audio.Play(My.Resources.Black_Vortex, AudioPlayMode.BackgroundLoop)
         Close()

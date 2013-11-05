@@ -1,6 +1,7 @@
 ﻿Public Class Screen
     Public GameGalaxy As Galaxy  'The Galaxy in the game
     Public MusicIsPlaying As Boolean = True
+    Public NewScale As Decimal = 1
 
     Public Sub New()
         InitializeComponent()
@@ -10,6 +11,19 @@
             GameGalaxy = New tutorialGalaxy(Me)
         End If
         Visible = True
+        Dim HeightDif As Integer = Height - My.Computer.Screen.WorkingArea.Height
+        Dim WidthDif As Integer = Width - My.Computer.Screen.WorkingArea.Width
+        If WidthDif > 1 Or
+            HeightDif > 1 Then
+            If HeightDif > WidthDif Then
+                NewScale = 1 - (1 / (Height / HeightDif))
+            Else
+                NewScale = 1 - (1 / (Width / WidthDif))
+            End If
+            Scale(New SizeF(NewScale, NewScale))
+            Location = New Point(((My.Computer.Screen.WorkingArea.Width - Width) / 2),
+                                 ((My.Computer.Screen.WorkingArea.Height - Height) / 2))
+        End If
     End Sub
 
     Public Sub UpdateTick()
