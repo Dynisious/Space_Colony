@@ -11,28 +11,25 @@ Public Class galaxyTile
         Sector
         System
     End Enum
-    Public Zoom As ZoomLevels = ZoomLevels.Sector
+    Public Shared Zoom As ZoomLevels = ZoomLevels.Sector
 
     Public Sub New(ByRef NParent As Galaxy, ByRef NReference As sector, ByVal NPosition As Point)
         P = NParent
-        Reference = NReference
-        Reference.graphic = Me
         Position = NPosition
         b = New btnTile(Me)
-        Update()
     End Sub
 
     Public Sub Zoom_Out()
-        Reference = P.Sectors(Position.X, Position.Y)
         Zoom = ZoomLevels.Sector
         Update()
     End Sub
 
     Public Sub Update()
-        b.FlatAppearance.BorderColor = Color.LightSlateGray
+        b.FlatAppearance.BorderSize = 0
         b.BackColor = Color.Transparent
+        b.Text = ""
         '-----Change the graphic-----
-        If Reference.Empty = False Then 'Its filled
+        If Reference IsNot Nothing Then
             Select Case Reference.Friendly
                 Case Galaxy.Allegence.Friendly
                     b.FlatAppearance.BorderColor = Color.LimeGreen
@@ -42,24 +39,28 @@ Public Class galaxyTile
                     b.FlatAppearance.BorderSize = 2
                 Case Galaxy.Allegence.Neutral
                     b.FlatAppearance.BorderColor = Color.Yellow
+                    b.FlatAppearance.BorderSize = 2
             End Select
             If Zoom = ZoomLevels.Sector Then
                 Dim Sec As sector = Reference
                 b.Text = CStr(Sec.Fleets.Length)
+                If Sec.Highlighted = True Then 'Its highlighted
+                    b.BackColor = Color.LightBlue
+                End If
             End If
-        End If
-        If Zoom = ZoomLevels.System Then
-            b.Text = ""
-        End If
-
-        If Reference.Highlighted = True Then 'Its highlighted
-            b.BackColor = Color.LightBlue
         End If
         '----------------------------
     End Sub
 
-    Public Sub Clicked(e As MouseEventArgs)
-        Reference.Clicked(e)
+    Public Sub clicked(ByVal e As MouseEventArgs)
+        If Reference IsNot Nothing Then
+            Reference.Clicked(e)
+        Else
+            P.P.StatDisplay.Text = ""
+            P.FleetToMove = Nothing
+            P.MakingWormhole = Nothing
+            P.AddingShips = Nothing
+        End If
     End Sub
 
 End Class

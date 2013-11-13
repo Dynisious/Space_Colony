@@ -69,9 +69,7 @@ Public Class fleet
             Next
             If GoOn = True Then 'Theres ships 
                 For Each i As ship In Ships
-                    If Equals(i, Nothing) = False Then
-                        i.Update()
-                    End If
+                    i.Update()
                 Next
             Else 'Theres only drones
                 For Each i As ship In Ships
@@ -84,13 +82,7 @@ Public Class fleet
 
     Public Overridable Sub Kill()
         P.Remove_Fleet(Me)
-        If Object.ReferenceEquals(Me, Screen.GameGalaxy.FleetToMove) = True Then 'Im selected
-            Screen.GameGalaxy.FleetToMove = Nothing
-            For Each i As wormhole In P.Connections
-                i.P.Highlighted = False
-            Next
-        End If
-        P = Nothing
+        ReDim Ships(-1)
     End Sub
 
 End Class

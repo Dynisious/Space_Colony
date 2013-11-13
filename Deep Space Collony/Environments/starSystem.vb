@@ -51,21 +51,14 @@ Public Class starSystem
         Friendly = Galaxy.Allegence.Neutral
         '-----Set the Type-----
         Randomize()
-        If Int(32 * Rnd()) = 0 Then 'Shouldn't it be Empty
-            'No it Shouldnt be empty
-            Empty = False
-            Randomize()
-            If Int(6 * Rnd()) = 0 Then 'Should it be a Nebula
-                'Yes it should be a Nebula
-                Type = SystemTypes.Nebula
-                Discription = Discriptions(Int((3 * Rnd()) + 4))
-            Else
-                'No it should be a Solar System
-                Type = SystemTypes.Solar
-                Discription = Discriptions(Int((3 * Rnd()) + 1))
-            End If
-        Else 'It should be empty
-            Empty = True
+        If Int(6 * Rnd()) = 0 Then 'Should it be a Nebula
+            'Yes it should be a Nebula
+            Type = SystemTypes.Nebula
+            Discription = Discriptions(Int((3 * Rnd()) + 4))
+        Else
+            'No it should be a Solar System
+            Type = SystemTypes.Solar
+            Discription = Discriptions(Int((3 * Rnd()) + 1))
         End If
         '----------------------
 
@@ -73,55 +66,48 @@ Public Class starSystem
 
     Public Overrides Sub Clicked(ByVal e As MouseEventArgs)
         If e.Button = MouseButtons.Left And e.Clicks = 2 Then 'Colonize the starSystem
-            If Empty = False Then 'Its not empty
-                If P.Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
-                    If P.P.ProduceStores(Galaxy.Produce.Resource) >= 60 Then 'You have the supplies
-                        '-----Colonise-----
-                        P.P.ProduceStores(Galaxy.Produce.Resource) =
-                            P.P.ProduceStores(Galaxy.Produce.Resource) - 60 'Remove the resources
-                        Friendly = Galaxy.Allegence.Friendly 'Make player owned
-                        '------------------
-                    End If
+            If P.Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
+                If P.P.ProduceStores(Galaxy.Produce.Resource) >= 60 Then 'You have the supplies
+                    '-----Colonise-----
+                    P.P.ProduceStores(Galaxy.Produce.Resource) =
+                        P.P.ProduceStores(Galaxy.Produce.Resource) - 60 'Remove the resources
+                    Friendly = Galaxy.Allegence.Friendly 'Make player owned
+                    '------------------
                 End If
             End If
+        ElseIf e.Button = MouseButtons.Right Then 'Zoom out
+            P.ZoomOut()
         End If
 
-        If Empty = False Then 'The system is not empty
-            Dim Str As String
-            '-----Calculating Stats-----
-            '-----Getting Allegence-----
-            Select Case Friendly
-                Case Galaxy.Allegence.Enemy
-                    Str = "Enemy"
-                Case Galaxy.Allegence.Friendly
-                    Str = "Player"
-                Case Galaxy.Allegence.Neutral
-                    Str = "Nil"
-            End Select
-            Info = "System Allegence: " + Str + Environment.NewLine
-            '---------------------------
-
-            '-----Getting Type-----
-            Select Case Type
-                Case SystemTypes.Solar
-                    Str = "Solar System"
-                Case SystemTypes.Nebula
-                    Str = "Nebula"
-            End Select
-            Info = Info + "System Type: " + Str + Environment.NewLine +
-                "Cost to Collonise: 60 Resource" + Environment.NewLine +
-                "Discription: " + Discription
-            '----------------------
-            '---------------------------
-
-            P.P.P.StatDisplay.Text = Info
-        Else 'Its empty
-            P.P.P.StatDisplay.Text = "" 'Clear the display
+        Dim Str As String
+        '-----Calculating Stats-----
+        '-----Getting Allegence-----
+        If Friendly = Galaxy.Allegence.Enemy Then
+            Str = "Enemy"
+        ElseIf Friendly = Galaxy.Allegence.Friendly Then
+            Str = "Player"
+        Else
+            Str = "Nil"
         End If
+        Info = "System Allegence: " + Str + Environment.NewLine
+        '---------------------------
 
-        For Each i As galaxyTile In P.P.Tiles
-            i.Update()
-        Next
+        '-----Getting Type-----
+        Select Case Type
+            Case SystemTypes.Solar
+                Str = "Solar System"
+            Case SystemTypes.Nebula
+                Str = "Nebula"
+        End Select
+        Info = Info + "System Type: " + Str + Environment.NewLine +
+            "Cost to Collonise: 60 Resource" + Environment.NewLine +
+            "Discription: " + Discription
+        '----------------------
+        '---------------------------
+
+        P.P.P.StatDisplay.Text = Info
+
+        Graphic.Update()
     End Sub
 
     Public Overrides Sub Update()

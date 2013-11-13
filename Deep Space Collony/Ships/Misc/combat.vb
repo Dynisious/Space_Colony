@@ -22,6 +22,7 @@ Public Class Combat
             If Equals(i, Nothing) = False Then
                 If i.Friendly <> FleetToCheck.Friendly Then 'Theres different allegencies
                     GoOn = True
+                    Exit For
                 End If
             End If
         Next

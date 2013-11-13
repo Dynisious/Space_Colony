@@ -1,11 +1,13 @@
 ﻿Public Class Screen
     Public GameGalaxy As Galaxy  'The Galaxy in the game
+    Public Tutorial As Boolean
     Public MusicIsPlaying As Boolean = True
     Public NewScale As Decimal = 1
 
-    Public Sub New()
+    Public Sub New(ByVal NTutorial As Boolean)
         InitializeComponent()
-        If MainMenu.Tutorial = False Then 'Its not a tutorial
+        Tutorial = NTutorial
+        If Tutorial = False Then 'Its not a tutorial
             GameGalaxy = New Galaxy(Me)
         Else
             GameGalaxy = New tutorialGalaxy(Me)
@@ -35,23 +37,19 @@
         '------------------------
     End Sub
 
-    Private Sub btnZoomOut_Click(sender As System.Object, e As System.EventArgs) Handles btnZoomOut.Click
-        GameGalaxy.Zoom_Out()
-    End Sub
-
     Private Sub btnClosed_Click(sender As System.Object, e As System.EventArgs) Handles btnEnd.Click
         End
     End Sub
 
     Private Sub btnAddShips_Click(sender As System.Object, e As System.EventArgs) Handles btnAddShips.Click
         GameGalaxy.FleetToMove = Nothing
-        GameGalaxy.ClosingWormhole = False
+        GameGalaxy.MakingWormhole = False
         GameGalaxy.AddingShips = True
     End Sub
 
-    Private Sub Button1_Click(sender As System.Object, e As System.EventArgs) Handles btnClosingHoles.Click
+    Private Sub btnClosingHoles_Click(sender As System.Object, e As System.EventArgs) Handles btnClosingHoles.Click
         GameGalaxy.FleetToMove = Nothing
-        GameGalaxy.ClosingWormhole = True
+        GameGalaxy.MakingWormhole = True
         GameGalaxy.AddingShips = False
     End Sub
 
@@ -65,9 +63,8 @@
         Next
         GameGalaxy.WorldTimer.Enabled = Temp
         btnAddShips.Enabled = Temp
-        btnZoomOut.Enabled = Temp
         btnClosingHoles.Enabled = Temp
-        GameGalaxy.ClosingWormhole = Nothing
+        GameGalaxy.MakingWormhole = Nothing
         GameGalaxy.AddingShips = Nothing
     End Sub
 
@@ -84,6 +81,6 @@
     End Sub
 
     Private Sub btnSave_Click(sender As System.Object, e As System.EventArgs) Handles btnSave.Click
-        Dim Temp As New SaveLoad(SaveLoad.FileModes.Saving)
+        Dim Temp As New SaveLoad(SaveLoad.FileModes.Saving, Me)
     End Sub
 End Class

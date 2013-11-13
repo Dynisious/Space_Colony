@@ -13,7 +13,8 @@ Public Class Galaxy
         .Interval = 10} 'The timer for the world to update on
     Public TickCount As Integer
     Public AddingShips As Boolean = False
-    Public ClosingWormhole As Boolean = False
+    Public MakingWormhole As Boolean = False
+    Public FleetToMove As fleet
     Public PirateCount As Integer
     Public Enum Produce 'The Resources used in game
         Resource
@@ -30,7 +31,6 @@ Public Class Galaxy
         {Produce.Gas, 0},
         {Produce.Science, 0}
     } 'The stores of different produces
-    Public FleetToMove As fleet
 
     Public Sub New(ByRef NParent As Screen)
         P = NParent
@@ -39,36 +39,38 @@ Public Class Galaxy
         '-----Initialise the grid of sectors-----
         For X As Integer = 0 To 26
             For Y As Integer = 0 To 9
-                Sectors(X, Y) = New sector(Me, New Point(X, Y))
+                Randomize()
+                If Int(5 * Rnd()) = 0 Then 'If it should be filled
+                    Sectors(X, Y) = New sector(Me, New Point(X, Y))
+                End If
             Next
         Next
         '---------------------------------------------
 
         '-----Initialise the sector connections-----
         For Each i As sector In Sectors
-            If i.Empty = False Then 'its not empty
+            If i IsNot Nothing Then  'its not empty
                 i.Make_Connetions()
             End If
         Next
         '-------------------------------------------
 
         '-----Initialize the starting sector-----
-        Do Until Sectors(0, 0).Empty = False
-            Sectors(0, 0) = New sector(Me, New Point(0, 0))
-            Sectors(0, 0).Make_Connetions()
-            If Sectors.Length <> 0 Then
-                For Each i As wormhole In Sectors(0, 0).Connections
-                    ReDim Sectors(i.Opening.X, i.Opening.Y).Connections(-1)
-                    Sectors(i.Opening.X, i.Opening.Y).Make_Connetions()
-                Next
-                Sectors(0, 0).Friendly = Allegence.Friendly  'Make it owned by the player
-            Else
-                Sectors(0, 0).Empty = True
-            End If
-        Loop
+        Sectors(0, 0) = New sector(Me, New Point(0, 0))
+        Sectors(0, 0).Make_Connetions()
+        If Sectors(0, 0) IsNot Nothing Then
+            For Each i As wormhole In Sectors(0, 0).Connections
+                ReDim Sectors(i.Opening.X, i.Opening.Y).Connections(-1)
+                Sectors(i.Opening.X, i.Opening.Y).Make_Connetions()
+            Next
+            Sectors(0, 0).Friendly = Allegence.Friendly  'Make it owned by the player
+        Else
+            P.GameGalaxy = New Galaxy(P)
+            Exit Sub
+        End If
         Sectors(0, 0).Friendly = Allegence.Friendly
         For Each i As starSystem In Sectors(0, 0).Systems
-            If i.Empty = False Then 'The starSystem is not empty
+            If i IsNot Nothing Then 'The starSystem is not empty
                 i.Friendly = Allegence.Friendly 'Make it friendly
             End If
         Next
@@ -78,61 +80,54 @@ Public Class Galaxy
         Next
         ProduceStores(Produce.Resource) = 400
         ProduceStores(Produce.Gas) = 400
-        If Sectors(0, 0).Connections.Length < 2 Then
-            P.GameGalaxy = New Galaxy(P)
-            Exit Sub
-        End If
         '----------------------------------------
 
         '-----Spawn Pirates-----
-        Do Until Sectors(26, 9).Empty = False
-            Sectors(26, 9) = New sector(Me, New Point(26, 9))
-            Sectors(26, 9).Make_Connetions()
-            If Equals(Sectors(26, 9).Connections(0), Nothing) = False Then
-                For Each i As wormhole In Sectors(26, 9).Connections
-                    ReDim Sectors(i.Opening.X, i.Opening.Y).Connections(-1)
-                    Sectors(i.Opening.X, i.Opening.Y).Make_Connetions()
-                Next
-                Sectors(26, 9).Friendly = Allegence.Enemy
-                For Each i As starSystem In Sectors(26, 9).Systems
-                    If Equals(i, Nothing) = False Then
-                        If i.Empty = False Then
-                            i.Friendly = Allegence.Enemy
-                        End If
-                    End If
-                Next
-            Else
-                Sectors(26, 9).Empty = True
-            End If
-        Loop
+        Sectors(26, 9) = New sector(Me, New Point(26, 9))
+        Sectors(26, 9).Make_Connetions()
+        If Sectors(26, 9) IsNot Nothing Then
+            For Each i As wormhole In Sectors(26, 9).Connections
+                ReDim Sectors(i.Opening.X, i.Opening.Y).Connections(-1)
+                Sectors(i.Opening.X, i.Opening.Y).Make_Connetions()
+            Next
+            Sectors(26, 9).Friendly = Allegence.Enemy
+            For Each i As starSystem In Sectors(26, 9).Systems
+                If i IsNot Nothing Then
+                    i.Friendly = Allegence.Enemy
+                End If
+            Next
+        Else
+            P.GameGalaxy = New Galaxy(P)
+            Exit Sub
+        End If
 
         Dim Pirate As New fleet(Sectors(26, 9), New dreadnought, New Point(26, 9), Allegence.Enemy)
         For i As Integer = 0 To 5
             Pirate.Add_Ship(New destroyer)
         Next
         Sectors(26, 9).Add_Fleet(Pirate)
-        For i As Integer = 0 To 2
+        For i As Integer = 0 To 6
             Sectors(26, 9).Add_Fleet(New PirateFleet(Sectors(26, 9), 0, New Point(26, 9)))
         Next
-        If Sectors(26, 9).Connections.Length < 2 Then
-            P.GameGalaxy = New Galaxy(P)
-            Exit Sub
-        End If
         '-----------------------
-
-        '-----Remove Cutoff Areas-----
-        For Each i As sector In Sectors
-            If i.Empty = False And UBound(i.Connections) = 0 Then
-                i.Empty = True
-            End If
-        Next
-        '-----------------------------
 
         '-----Initialise the grid of tiles-----
         For X As Integer = 0 To 26
             For Y As Integer = 0 To 9
                 Tiles(X, Y) = New galaxyTile(Me, Sectors(X, Y), New Point(X, Y))
             Next
+        Next
+        For Each i As sector In Sectors
+            If i IsNot Nothing Then
+                i.Graphic = Tiles(i.Position.X, i.Position.Y)
+                Tiles(i.Position.X, i.Position.Y).Reference = i
+                For Each e As starSystem In i.Systems
+                    If e IsNot Nothing Then
+                        e.Graphic = Tiles(i.Position.X, i.Position.Y)
+                    End If
+                Next
+                i.Graphic.Update()
+            End If
         Next
         '--------------------------------------
 
@@ -150,17 +145,12 @@ Public Class Galaxy
     Private Sub Update() Handles WorldTimer.Tick
         '-----Win or Lose-----
         Dim GameWinCheck As Boolean = True 'Theres no more Enemies
+        Dim GameLoseCheck As Boolean = True 'Theres no more Friendlies
         For Each i As sector In Sectors
-            If i.Empty = False Then
+            If i IsNot Nothing Then
                 If i.Friendly <> Allegence.Friendly Then
                     GameWinCheck = False 'Theres uncaptured areas
-                End If
-            End If
-        Next
-        Dim GameLoseCheck As Boolean = True   'Theres no more Friendlies
-        For Each i As sector In Sectors
-            If i.Empty = False Then
-                If i.Friendly = Allegence.Friendly Then
+                Else
                     GameLoseCheck = False 'Theres Friendlies
                 End If
             End If
@@ -172,7 +162,7 @@ Public Class Galaxy
         If Int(25 * Rnd()) = 0 And PirateCount < 7 Then 'There are less than 7 pirates
             Dim X As Integer = Int(26 * Rnd())
             Dim Y As Integer = Int(9 * Rnd())
-            If Sectors(X, Y).Empty = False Then 'If its not empty
+            If Sectors(X, Y) IsNot Nothing Then 'If its not empty
                 If Sectors(X, Y).Friendly = Allegence.Enemy Then 'If its an enemy tile
                     Sectors(X, Y).Add_Fleet(New PirateFleet(Sectors(X, Y), TickCount, New Point(X, Y)))
                 End If
@@ -182,13 +172,11 @@ Public Class Galaxy
 
         '-----Update Sectors-----
         For Each i As sector In Sectors
-            If i.Empty = False Then 'Make sure the sector isn't empty
+            If i IsNot Nothing Then 'Make sure the sector isn't empty
                 Dim GoOn As Boolean = False
                 If i.Friendly = Allegence.Friendly Then 'its friendly 
                     GoOn = True
                 ElseIf i.Fleets.Length <> 0 Then 'it has a fleet
-                    GoOn = True
-                ElseIf i.Highlighted = True Then
                     GoOn = True
                 End If
                 If GoOn = True Then
@@ -204,7 +192,7 @@ Public Class Galaxy
 
         If GameWinCheck = True Or GameLoseCheck = True Then 'Gameover
             P.Pause_Click(Me, New EventArgs)
-            Dim Temp As New GameOver
+            Dim Temp As New GameOver(P)
             If GameLoseCheck = True Then 'The player lost
                 Temp.ForeColor = Color.Red
                 Temp.Text = "You Lost!"
@@ -213,13 +201,6 @@ Public Class Galaxy
                 Temp.Text = "You One!"
             End If
         End If
-    End Sub
-
-    Public Sub Zoom_Out()
-        For Each i As galaxyTile In Tiles
-            i.Zoom_Out()
-            i.Update()
-        Next
     End Sub
 
 End Class

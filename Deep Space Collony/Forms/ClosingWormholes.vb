@@ -1,5 +1,6 @@
 ﻿Public Class ClosingWormholes
     Private WithEvents tick As New Timer With {.Enabled = True, .Interval = 100}
+    Public P As sector 'The sector being interacted with
     Public Wormholes() As wormhole 'The fleets being interacted with
     Public btns(0) As btnHole 'The buttons
     Private Shared ReadOnly Alpha As New Dictionary(Of Integer, String) From {
@@ -9,14 +10,14 @@
         {21, "V"}, {22, "W"}, {23, "X"}, {24, "Y"}, {25, "Z"}, {26, "AA"}
     }
 
-    Public Sub New(ByRef NWormholes() As wormhole, ByVal SecPos As Point)
+    Public Sub New(ByRef NParent As sector, ByRef NWormholes() As wormhole)
         InitializeComponent()
-        CreateControl()
+        P = NParent
         Visible = True
         Wormholes = NWormholes
 
         For Each i As wormhole In Wormholes
-            If i.Opening <> SecPos Then 'Its not the same as the sector
+            If i.Opening <> NParent.Position Then 'Its not the same as the sector
                 If Equals(btns(0), Nothing) = False Then 'Its got buttons
                     ReDim Preserve btns(UBound(btns) + 1) 'Add a new space
                 End If
@@ -67,8 +68,8 @@
     End Class
 
     Private Sub Cancel_Click(sender As System.Object, e As System.EventArgs) Handles Cancel.Click
-        Screen.Enabled = True
-        Screen.BringToFront()
+        P.P.P.Enabled = True
+        P.P.P.BringToFront()
         Close()
     End Sub
 

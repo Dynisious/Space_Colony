@@ -66,9 +66,9 @@
                         End If
                     Next
                 End If
-                Screen.Pause_Click(Me, New EventArgs)
-                Screen.Enabled = True
-                Screen.BringToFront()
+                P.P.P.P.Pause_Click(Me, New EventArgs)
+                P.P.P.P.Enabled = True
+                P.P.P.P.BringToFront()
                 P.Close()
             End If
 
@@ -78,9 +78,9 @@
     End Class
 
     Private Sub Cancel_Click(sender As System.Object, e As System.EventArgs) Handles Cancel.Click
-        Screen.Pause_Click(Me, New EventArgs)
-        Screen.Enabled = True
-        Screen.BringToFront()
+        P.P.P.Pause_Click(Me, New EventArgs)
+        P.P.P.Enabled = True
+        P.P.P.BringToFront()
         For Each i As wormhole In P.Connections
             P.P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
         Next

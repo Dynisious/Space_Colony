@@ -132,12 +132,6 @@
     <Compile Include="Forms\MainMenu.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ResearchingUpgrades.Designer.vb">
-      <DependentUpon>ResearchingUpgrades.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Forms\ResearchingUpgrades.vb">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Forms\SaveLoad.Designer.vb">
       <DependentUpon>SaveLoad.vb</DependentUpon>
     </Compile>
@@ -260,9 +254,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MainMenu.resx">
       <DependentUpon>MainMenu.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ResearchingUpgrades.resx">
-      <DependentUpon>ResearchingUpgrades.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SaveLoad.resx">
       <DependentUpon>SaveLoad.vb</DependentUpon>

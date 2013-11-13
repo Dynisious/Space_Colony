@@ -24,7 +24,6 @@ Partial Class Screen
     Private Sub InitializeComponent()
         Me.Window = New System.Windows.Forms.Panel()
         Me.StatDisplay = New System.Windows.Forms.Label()
-        Me.btnZoomOut = New System.Windows.Forms.Button()
         Me.btnAddShips = New System.Windows.Forms.Button()
         Me.btnEnd = New System.Windows.Forms.Button()
         Me.lblStores = New System.Windows.Forms.Label()
@@ -90,22 +89,12 @@ Partial Class Screen
         Me.StatDisplay.Size = New System.Drawing.Size(360, 250)
         Me.StatDisplay.TabIndex = 1
         '
-        'btnZoomOut
-        '
-        Me.btnZoomOut.Location = New System.Drawing.Point(60, 453)
-        Me.btnZoomOut.Margin = New System.Windows.Forms.Padding(20)
-        Me.btnZoomOut.Name = "btnZoomOut"
-        Me.btnZoomOut.Size = New System.Drawing.Size(85, 25)
-        Me.btnZoomOut.TabIndex = 3
-        Me.btnZoomOut.Text = "Zoom Out"
-        Me.btnZoomOut.UseVisualStyleBackColor = True
-        '
         'btnAddShips
         '
         Me.btnAddShips.Location = New System.Drawing.Point(60, 508)
         Me.btnAddShips.Margin = New System.Windows.Forms.Padding(20, 10, 20, 20)
         Me.btnAddShips.Name = "btnAddShips"
-        Me.btnAddShips.Size = New System.Drawing.Size(85, 25)
+        Me.btnAddShips.Size = New System.Drawing.Size(85, 38)
         Me.btnAddShips.TabIndex = 4
         Me.btnAddShips.Text = "Add Ships"
         Me.btnAddShips.UseVisualStyleBackColor = True
@@ -740,7 +729,6 @@ Partial Class Screen
         Me.Controls.Add(Me.lblStores)
         Me.Controls.Add(Me.btnEnd)
         Me.Controls.Add(Me.btnAddShips)
-        Me.Controls.Add(Me.btnZoomOut)
         Me.Controls.Add(Me.StatDisplay)
         Me.Controls.Add(Me.Window)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None
@@ -752,7 +740,6 @@ Partial Class Screen
     End Sub
     Friend WithEvents Window As System.Windows.Forms.Panel
     Friend WithEvents StatDisplay As System.Windows.Forms.Label
-    Friend WithEvents btnZoomOut As System.Windows.Forms.Button
     Friend WithEvents btnAddShips As System.Windows.Forms.Button
     Friend WithEvents btnEnd As System.Windows.Forms.Button
     Friend WithEvents lblStores As System.Windows.Forms.Label

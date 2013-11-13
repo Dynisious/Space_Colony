@@ -1,5 +1,4 @@
 ﻿Public Class MainMenu
-    Public Tutorial As Boolean = False
     Public NewScale As Decimal = 1
 
     Public Sub New()
@@ -26,14 +25,13 @@
     End Sub
 
     Public Sub btnNewGame_Click(sender As System.Object, e As System.EventArgs) Handles btnNewGame.Click
-        Screen.CreateControl()
+        Dim Temp As New Screen(False)
         Close()
     End Sub
 
     Private Sub btnTutorial_Click(sender As System.Object, e As System.EventArgs) Handles btnTutorial.Click
-        Tutorial = True
-        Screen.CreateControl()
-        tutorialWindow.CreateControl()
+        Dim Temp As New Screen(True)
+        Dim Temp1 As New tutorialWindow(Temp)
         My.Computer.Audio.Play(My.Resources.Black_Vortex, AudioPlayMode.BackgroundLoop)
         Close()
     End Sub

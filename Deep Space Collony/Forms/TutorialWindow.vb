@@ -1,5 +1,6 @@
 ﻿Public Class tutorialWindow
     Private WithEvents T As New Timer With {.Enabled = True, .Interval = 1500}
+    Public P As Screen
     Public Enum Messages
         Min
         Intro
@@ -50,19 +51,20 @@
         "Well I've done all I can for you so now if you return to the home screen and press ‘New Game’ button we can shoot you off into deep space to begin expanding The Empire of Man. Unless you don’t feel ready in which case feel free to look back through this tutorial and to fend off the pirates here with your superior fire power."}
     }
 
-    Public Sub New()
+    Public Sub New(ByRef NParent As Screen)
         InitializeComponent()
 
+        P = NParent
         Message = Messages.Intro
         lbl.Text = Strings(Message)
         Visible = True
-        Screen.Pause_Click(Me, New EventArgs)
+        P.Pause_Click(Me, New EventArgs)
     End Sub
 
     Private Sub PreviousInstruction_Click(sender As System.Object, e As System.EventArgs) Handles PreviousInstruction.Click
         If Message - 1 <> Messages.Min Then
-            If Screen.GameGalaxy.WorldTimer.Enabled = True Then
-                Screen.Pause_Click(Me, New EventArgs)
+            If P.GameGalaxy.WorldTimer.Enabled = True Then
+                P.Pause_Click(Me, New EventArgs)
             End If
             Message = Message - 1
             lbl.Text = Strings(Message)
@@ -71,8 +73,8 @@
 
     Private Sub NextInstruction_Click(sender As System.Object, e As System.EventArgs) Handles NextInstruction.Click
         If Message + 1 <> Messages.Max Then
-            If Screen.GameGalaxy.WorldTimer.Enabled = True Then
-                Screen.Pause_Click(Me, New EventArgs)
+            If P.GameGalaxy.WorldTimer.Enabled = True Then
+                P.Pause_Click(Me, New EventArgs)
             End If
             Message = Message + 1
             lbl.Text = Strings(Message)

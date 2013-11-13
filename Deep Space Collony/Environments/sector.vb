@@ -9,25 +9,24 @@ Public Class sector
     Public Fleets(-1) As fleet 'The fleets inside the sector
     Public Connections(-1) As wormhole 'The sectors that you can move to from here
     Public Battle As Combat
+    Public Highlighted As Boolean = False
     Public Info As String
 
     Public Sub New(ByRef NParent As Galaxy, ByVal NPosition As Point)
         P = NParent
         Position = NPosition
         Friendly = Galaxy.Allegence.Neutral
-        Empty = False
         Randomize()
-        If Int(5 * Rnd()) = 0 Then 'If it should be filled
-            '-----Initialiaze the Grid of starSystems-----
-            For X As Integer = 0 To 26
-                For Y As Integer = 0 To 9
+        '-----Initialiaze the Grid of starSystems-----
+        For X As Integer = 0 To 26
+            For Y As Integer = 0 To 9
+                Randomize()
+                If Int(32 * Rnd()) = 0 Then 'Shouldn't it be Empty
                     Systems(X, Y) = New starSystem(Me, New Point(X, Y))
-                Next
+                End If
             Next
-            '---------------------------------------------
-        Else 'It should be empty
-            Empty = True
-        End If
+        Next
+        '---------------------------------------------
     End Sub
 
     Public Sub Make_Connetions()
@@ -55,152 +54,144 @@ Public Class sector
         '-----Make connections-----
         For X As Integer = XStart To XEnd
             For Y As Integer = YStart To YEnd
-                If X <= UBound(P.Sectors, 1) And Y <= UBound(P.Sectors, 2) Then 'Its not off the map
-                    If P.Sectors(X, Y).Empty = False Then 'The sector isn't empty
-                        ReDim Preserve Connections(Connections.Length) 'Add a blank space
-                        Connections(UBound(Connections)) = New wormhole(Me, New Point(X, Y)) 'Add the wormhole
-                    End If
+                If P.Sectors(X, Y) IsNot Nothing Then 'The sector isn't empty
+                    ReDim Preserve Connections(Connections.Length) 'Add a blank space
+                    Connections(UBound(Connections)) = New wormhole(Me, New Point(X, Y)) 'Add the wormhole
                 End If
             Next
         Next
         '--------------------------
+
+        '-----Check for issolation-----
+        If Connections.Length < 2 Then
+            P.Sectors(Position.X, Position.Y) = Nothing
+        End If
+        '------------------------------
     End Sub
 
     Public Overrides Sub Clicked(ByVal e As MouseEventArgs)
-        If Empty = False Then 'If the sector isn't empty
-            If e.Button = MouseButtons.Right Then 'They want to Interact the starSystem
+        If e.Button = MouseButtons.Right Then 'They want to Interact the starSystem
 
-                '-------------------------------------------------
-                For Each i As galaxyTile In P.Tiles
-                    i.Reference = Systems(i.Position.X, i.Position.Y)
-                    i.Zoom = galaxyTile.ZoomLevels.System
-                Next
-                For Each i As galaxyTile In P.Tiles
-                    i.Update()
-                Next
+            '-------------------------------------------------
+            galaxyTile.Zoom = galaxyTile.ZoomLevels.System
+            For Each i As sector In P.Sectors
+                If i IsNot Nothing Then
+                    i.Graphic.Reference = Nothing
+                    i.Graphic.Update()
+                End If
+            Next
+            For Each i As starSystem In Systems
+                If i IsNot Nothing Then
+                    i.Graphic.Reference = i
+                    i.Graphic.Update()
+                End If
+            Next
+            P.FleetToMove = Nothing
+            P.MakingWormhole = Nothing
+            P.AddingShips = Nothing
+            '-------------------------------------------------
+
+        ElseIf e.Button = MouseButtons.Left And P.AddingShips = True Then
+            If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
+                Dim Temp As New AddingShipsStep1(Fleets, Me)
                 P.FleetToMove = Nothing
-                P.ClosingWormhole = Nothing
+                P.MakingWormhole = Nothing
                 P.AddingShips = Nothing
-                '-------------------------------------------------
-
-            ElseIf e.Button = MouseButtons.Left And P.AddingShips = True Then
-                If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
-                    Dim Temp As New AddingShipsStep1(Fleets, Me)
-                    P.FleetToMove = Nothing
-                    P.ClosingWormhole = Nothing
-                    P.AddingShips = Nothing
-                    P.P.Enabled = False
-                End If
-
-            ElseIf e.Button = MouseButtons.Left And P.ClosingWormhole = True Then
-                If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
-                    Dim Temp As New ClosingWormholes(Connections, Position)
-                    P.FleetToMove = Nothing
-                    P.ClosingWormhole = Nothing
-                    P.AddingShips = Nothing
-                    P.P.Enabled = False
-                End If
-
-            ElseIf e.Button = MouseButtons.Left And e.Clicks = 2 Then  'Move or select fleets
-                '-------------------------------------------------
-                If Equals(P.FleetToMove, Nothing) Then 'there are no fleets selected
-                    If Fleets.Length <> 0 Then 'Theres ships inside the sector
-                        Dim GoOn As Boolean = False
-                        For Each i As fleet In Fleets
-                            If i.Friendly = Galaxy.Allegence.Friendly Then 'Theres player owned fleets
-                                GoOn = True
-                            End If
-                        Next
-
-                        If GoOn = True Then 'Start Selecting fleets
-                            Dim Selecting As New SelectingFleets(Me, Fleets)
-                            P.P.Pause_Click(Me, New EventArgs)
-                            P.P.Enabled = False
-                        End If
-                    End If
-                Else 'There are fleets selected
-                    If Highlighted = True Then 'If its highlighted
-                        If Equals(P.FleetToMove, Nothing) = False Then
-                            For Each i As wormhole In P.FleetToMove.P.Connections
-                                P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
-                            Next
-                            P.FleetToMove.P.Remove_Fleet(P.FleetToMove) 'Remove the old reference
-                            Add_Fleet(P.FleetToMove) 'Add the new fleet
-                            P.FleetToMove.Position = Position 'Set the fleets new position
-                            P.FleetToMove = Nothing
-                            P.ClosingWormhole = Nothing
-                            P.AddingShips = Nothing
-                        End If
-                    End If
-                End If
-                '-------------------------------------------------
-                    End If
+                P.P.Enabled = False
             End If
 
-        If Empty = False Then
-            Dim Str As String
-            '-----Calculating Stats-----
-            '-----Getting Allegence-----
-            Select Case Friendly
-                Case Galaxy.Allegence.Enemy
-                    Str = "Enemy"
-                Case Galaxy.Allegence.Friendly
-                    Str = "Player"
-                Case Galaxy.Allegence.Neutral
-                    Str = "Nil"
-            End Select
-            Info = "Sector Allegence: " + Str + Environment.NewLine
-            '---------------------------
+        ElseIf e.Button = MouseButtons.Left And P.MakingWormhole = True Then
+            If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
+                Dim Temp As New ClosingWormholes(Me, Connections)
+                P.FleetToMove = Nothing
+                P.MakingWormhole = Nothing
+                P.AddingShips = Nothing
+                P.P.Enabled = False
+            End If
 
-            '-----Counting Uncolonised Systems-----
-            Dim count1 As Integer
-            For Each i As starSystem In Systems
-                If i.Empty = False Then
-                    If i.Friendly = Galaxy.Allegence.Neutral Then
-                        count1 = count1 + 1
-                    End If
-                End If
-            Next
-            Info = Info + "Uncolonised Systems: " + CStr(count1) + Environment.NewLine
-            '--------------------------------------
-
-            '-----Counting Colonised Systems-----
-            Dim count2 As Integer
-            For Each i As starSystem In Systems
-                If i.Empty = False Then
-                    If i.Friendly <> Galaxy.Allegence.Neutral Then
-                        count2 = count2 + 1
-                    End If
-                End If
-            Next
-            Info = Info + "Colonised Systems: " + CStr(count2) + Environment.NewLine
-            '------------------------------------
-
-            '-----Counting Ships-----
-            Dim count(ship.Ship_Types.Max - 1) As Integer 'the number of each type of ship in the fleet
-            For Each i As fleet In Fleets
-                If Equals(i, Nothing) = False Then 'If theres a fleet
-                    For Each f As ship In i.Ships
-                        If Equals(f, Nothing) = False Then
-                            count(f.Type) = count(f.Type) + 1 'Add to the count
+        ElseIf e.Button = MouseButtons.Left And e.Clicks = 2 Then  'Move or select fleets
+            '-------------------------------------------------
+            If P.FleetToMove Is Nothing Then 'there are no fleets selected
+                If Fleets.Length <> 0 Then 'Theres ships inside the sector
+                    Dim GoOn As Boolean = False
+                    For Each i As fleet In Fleets
+                        If i.Friendly = Galaxy.Allegence.Friendly Then 'Theres player owned fleets
+                            GoOn = True
                         End If
+                        Exit For
                     Next
-                End If
-            Next
-            Info = Info + "Fighters: " + CStr(count(ship.Ship_Types.Fighter)) + Environment.NewLine +
-                "Bombers: " + CStr(count(ship.Ship_Types.Bomber)) + Environment.NewLine +
-                "Frigates: " + CStr(count(ship.Ship_Types.Frigate)) + Environment.NewLine +
-                "Destroyers: " + CStr(count(ship.Ship_Types.Destroyer)) + Environment.NewLine +
-                "Cruisers: " + CStr(count(ship.Ship_Types.Cruiser)) + Environment.NewLine +
-                "Dreadnoughts: " + CStr(count(ship.Ship_Types.Dreadnought))
-            '------------------------
-            '------------------------
 
-            P.P.StatDisplay.Text = Info
-        Else 'Its empty
-            P.P.StatDisplay.Text = "" 'Clear the display
+                    If GoOn = True Then 'Start Selecting fleets
+                        Dim Selecting As New SelectingFleets(Me, Fleets)
+                        P.P.Pause_Click(Me, New EventArgs)
+                        P.P.Enabled = False
+                    End If
+                End If
+            Else 'There are fleets selected
+                If Highlighted = True Then 'If its highlighted
+                    If Battle Is Nothing Then
+                        For Each i As wormhole In P.FleetToMove.P.Connections
+                            P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
+                        Next
+                        P.FleetToMove.P.Remove_Fleet(P.FleetToMove) 'Remove the old reference
+                        Add_Fleet(P.FleetToMove) 'Add the new fleet
+                        P.FleetToMove.Position = Position 'Set the fleets new position
+                    End If
+                    P.FleetToMove = Nothing
+                    P.MakingWormhole = Nothing
+                    P.AddingShips = Nothing
+                End If
+            End If
+            '-------------------------------------------------
         End If
 
+        Dim Str As String
+        '-----Calculating Stats-----
+        '-----Getting Allegence-----
+        If Friendly = Galaxy.Allegence.Enemy Then
+            Str = "Enemy"
+        ElseIf Friendly = Galaxy.Allegence.Friendly Then
+            Str = "Player"
+        Else
+            Str = "Nil"
+        End If
+        Info = "Sector Allegence: " + Str + Environment.NewLine
+        '---------------------------
+
+        '-----Counting Systems-----
+        Dim count1 As Integer
+        Dim count2 As Integer
+        For Each i As starSystem In Systems
+            If i IsNot Nothing Then
+                If i.Friendly = Galaxy.Allegence.Neutral Then
+                    count1 = count1 + 1
+                Else
+                    count2 = count2 + 1
+                End If
+            End If
+        Next
+        Info = Info + "Uncolonised Systems: " + CStr(count1) + Environment.NewLine +
+            "Colonised Systems: " + CStr(count2) + Environment.NewLine
+        '--------------------------
+
+        '-----Counting Ships-----
+        Dim count(ship.Ship_Types.Max - 1) As Integer 'the number of each type of ship in the fleet
+        For Each i As fleet In Fleets
+            For Each f As ship In i.Ships
+                count(f.Type) = count(f.Type) + 1 'Add to the count
+            Next
+        Next
+        Info = Info + "Fighters: " + CStr(count(ship.Ship_Types.Fighter)) + Environment.NewLine +
+            "Bombers: " + CStr(count(ship.Ship_Types.Bomber)) + Environment.NewLine +
+            "Frigates: " + CStr(count(ship.Ship_Types.Frigate)) + Environment.NewLine +
+            "Destroyers: " + CStr(count(ship.Ship_Types.Destroyer)) + Environment.NewLine +
+            "Cruisers: " + CStr(count(ship.Ship_Types.Cruiser)) + Environment.NewLine +
+            "Dreadnoughts: " + CStr(count(ship.Ship_Types.Dreadnought))
+        '------------------------
+        '------------------------
+
+        P.P.StatDisplay.Text = Info
+        Graphic.Update()
     End Sub
 
     Public Sub Add_Fleet(ByRef NFleet As fleet)
@@ -219,42 +210,33 @@ Public Class sector
     End Sub
 
     Public Sub Remove_Fleet(ByRef Nfleet As fleet)
-        Dim Index As Integer = -1 'The index of the fleet
-        Dim f As Integer = 0
-        Do Until Index <> -1
-            If ReferenceEquals(Fleets(f), Nfleet) Then
-                Index = f
-            Else
-                f = f + 1
-            End If
-        Loop
+        Dim Index As Integer = Array.IndexOf(Fleets, Nfleet) 'The index of the fleet
         For i As Integer = Index To UBound(Fleets)
             If i <> UBound(Fleets) Then
                 Fleets(i) = Fleets(i + 1) 'Move the rest of the Fleets back
             End If
         Next
-        ReDim Preserve Fleets(Fleets.Length - 2) 'Remove the empty space from the list
+        ReDim Preserve Fleets(UBound(Fleets) - 1) 'Remove the empty space from the list
 
         '-----Check Allegence-----
         Dim Friendlies As Integer
         Dim Enemies As Integer
-        If Fleets.Length <> 0 Then
-            For Each i As fleet In Fleets
+        For Each i As fleet In Fleets
+            If i.Friendly = Galaxy.Allegence.Friendly Then
+                Friendlies = Friendlies + 1
+            ElseIf i.Friendly = Galaxy.Allegence.Enemy Then
+                Enemies = Enemies + 1
+            End If
+        Next
+        For Each i As starSystem In Systems
+            If i IsNot Nothing Then
                 If i.Friendly = Galaxy.Allegence.Friendly Then
                     Friendlies = Friendlies + 1
                 ElseIf i.Friendly = Galaxy.Allegence.Enemy Then
                     Enemies = Enemies + 1
                 End If
-            Next
-        Else
-            For Each i As starSystem In Systems
-                If i.Friendly = Galaxy.Allegence.Friendly Then
-                    Friendlies = Friendlies + 1
-                ElseIf i.Friendly = Galaxy.Allegence.Enemy Then
-                    Enemies = Enemies + 1
-                End If
-            Next
-        End If
+            End If
+        Next
         If Friendlies > Enemies Then
             Friendly = Galaxy.Allegence.Friendly
         ElseIf Enemies > Friendlies Then
@@ -263,12 +245,11 @@ Public Class sector
             Friendly = Galaxy.Allegence.Neutral
         End If
         '-------------------------
-        If Nfleet.Friendly = Galaxy.Allegence.Friendly Then 'If the fleet was player owned
-            For Each i As wormhole In Connections
-                P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
-                P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
-            Next
-        End If
+
+        For Each i As wormhole In Connections
+            P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
+            P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
+        Next
     End Sub
 
     Public Overrides Sub Update()
@@ -307,13 +288,13 @@ Public Class sector
 
         '-----Systems-----
         For Each i As starSystem In Systems
-            If i.Friendly = Galaxy.Allegence.Friendly Then
-                i.Update()
-            End If
-        Next
-        For Each i As starSystem In Systems
-            If i.Friendly <> Galaxy.Allegence.Neutral And i.Friendly <> Friendly Then
-                i.Friendly = Galaxy.Allegence.Neutral
+            If i IsNot Nothing Then
+                If i.Friendly = Galaxy.Allegence.Friendly Then
+                    i.Update()
+                End If
+                If i.Friendly <> Galaxy.Allegence.Neutral And i.Friendly <> Friendly Then
+                    i.Friendly = Galaxy.Allegence.Neutral
+                End If
             End If
         Next
         '-----------------
@@ -332,7 +313,27 @@ Public Class sector
         End If
         '-------------------
 
-        Graphic.Update()
+        If galaxyTile.Zoom = galaxyTile.ZoomLevels.System Then
+            For Each i As starSystem In Systems
+                If i IsNot Nothing Then
+                    i.Graphic.Update()
+                End If
+            Next
+        Else
+            Graphic.Update()
+        End If
+    End Sub
+
+    Public Sub ZoomOut()
+        galaxyTile.Zoom = galaxyTile.ZoomLevels.Sector
+        For Each i As starSystem In Systems
+            i.Graphic.Reference = Nothing
+            i.Graphic.Update()
+        Next
+        For Each i As sector In P.Sectors
+            i.Graphic.Reference = i
+            i.Graphic.Update()
+        Next
     End Sub
 
 End Class

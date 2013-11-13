@@ -7,7 +7,7 @@
         Size = New Point(40, 40)
         Location = New Point((40 * P.Position.X), (40 * P.Position.Y))
         FlatStyle = Windows.Forms.FlatStyle.Flat
-        FlatAppearance.BorderSize = 1
+        FlatAppearance.BorderSize = 0
         ForeColor = Color.LimeGreen
         P.P.P.Window.Controls.Add(Me)
     End Sub

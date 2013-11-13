@@ -2,23 +2,25 @@
 
 Public Class SaveLoad
     Dim WithEvents tick As New Timer With {.Enabled = True, .Interval = 100}
+    Public P As Screen
     Public Enum FileModes
         Saving
         Loading
     End Enum
     Public Action As FileModes
 
-    Public Sub New(ByVal NAction As FileModes)
+    Public Sub New(ByVal NAction As FileModes, Optional ByRef NParent As Screen = Nothing)
         InitializeComponent()
+        P = NParent
         Action = NAction
         If IO.Directory.Exists("..\..\SpaceColonySaves") = False Then 'The path doesn't exist
             IO.Directory.CreateDirectory("..\..\SpaceColonySaves")
         End If
         If NAction = FileModes.Saving Then
             btnSaveLoad.Text = "Save"
-            If Screen.GameGalaxy.WorldTimer.Enabled = True Then 'Pause the game
-                Screen.Pause_Click(Me, New EventArgs)
-                Screen.Enabled = False
+            If P.GameGalaxy.WorldTimer.Enabled = True Then 'Pause the game
+                P.Pause_Click(Me, New EventArgs)
+                P.Enabled = False
             End If
         ElseIf NAction = FileModes.Loading Then
             btnSaveLoad.Text = "Load"
@@ -45,19 +47,19 @@ Public Class SaveLoad
             If Action = FileModes.Saving Then
                 Using fs As New IO.FileStream("..\..\SpaceColonySaves\" + lblName.Text + ".save", IO.FileMode.Create)
                     Dim bf As BinaryFormatter = New BinaryFormatter
-                    bf.Serialize(fs, Screen.GameGalaxy)
+                    bf.Serialize(fs, P.GameGalaxy)
                     fs.Close()
                 End Using
-                Screen.Enabled = True
-                Screen.Pause_Click(Me, New EventArgs)
-                Screen.BringToFront()
+                P.Enabled = True
+                P.Pause_Click(Me, New EventArgs)
+                P.BringToFront()
             ElseIf Action = FileModes.Loading Then
                 Using fs As New IO.FileStream("..\..\SpaceColonySaves\" + lblName.Text + ".save", IO.FileMode.OpenOrCreate)
                     If fs.Length <> 0 Then 'Its not an empty file
                         Dim bf As BinaryFormatter = New BinaryFormatter
-                        MainMenu.btnNewGame_Click(Me, New EventArgs)
-                        Screen.GameGalaxy = bf.Deserialize(fs)
-                        Screen.GameGalaxy.LoadGame(Screen)
+                        P = New Screen(False)
+                        P.GameGalaxy = bf.Deserialize(fs)
+                        P.GameGalaxy.LoadGame(P)
                         fs.Close()
                     Else
                         MainMenu.Enabled = True
@@ -74,9 +76,11 @@ Public Class SaveLoad
     End Sub
 
     Private Sub btnCancel_Click(sender As System.Object, e As System.EventArgs) Handles btnCancel.Click
-        Screen.Pause_Click(Me, New EventArgs)
-        Screen.Enabled = True
-        Screen.BringToFront()
+        If P IsNot Nothing Then
+            P.Pause_Click(Me, New EventArgs)
+            P.Enabled = True
+            P.BringToFront()
+        End If
         Close()
     End Sub
 End Class

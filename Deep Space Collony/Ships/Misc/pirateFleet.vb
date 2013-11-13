@@ -45,7 +45,7 @@ Public Class PirateFleet
         If TickCount = 0 Then
             Dim GoOn As Boolean = True
             For Each i As starSystem In P.Systems
-                If i.Empty = False Then
+                If i IsNot Nothing Then
                     If i.Friendly = Galaxy.Allegence.Neutral Then
                         GoOn = False
                     End If
@@ -66,9 +66,9 @@ Public Class PirateFleet
                             ExitHole = i
                         End If
                     Next
-                    If Equals(ExitHole, Nothing) = False Then
+                    If ExitHole IsNot Nothing Then
                         If ExitHole.Closed = False Then 'The wormhole is open
-                            If NewSec.Empty = False Then
+                            If NewSec IsNot Nothing Then
                                 MakeJump = True
                                 P.Remove_Fleet(Me) 'Remove the old reference
                                 ExitHole.P.Add_Fleet(Me) 'Add the new reference
@@ -79,23 +79,21 @@ Public Class PirateFleet
             ElseIf GoOn = False And Int(4 * Rnd()) = 0 Then 'Colonise
                 Dim sys As starSystem
                 For Each i As starSystem In P.Systems
-                    If i.Empty = False Then
+                    If i IsNot Nothing Then
                         If i.Friendly = Galaxy.Allegence.Neutral Then
                             sys = i
+                            Exit For
                         End If
                     End If
                 Next
-                If Equals(sys, Nothing) = False Then
-                    sys.Friendly = Galaxy.Allegence.Enemy
-                End If
+                sys.Friendly = Galaxy.Allegence.Enemy
             End If
         End If
     End Sub
 
     Public Overrides Sub Kill()
+        MyBase.Kill()
         P.P.PirateCount = P.P.PirateCount - 1
-        P.Remove_Fleet(Me)
-        P = Nothing
     End Sub
 
 End Class
