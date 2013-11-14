@@ -5,7 +5,7 @@ Public Class destroyer
     Inherits ship
 
     Public Shared Destroyer_Stats As New Dictionary(Of Ship_Stats, Integer) From {
-        {Ship_Stats.MaximumShields, 30},
+        {Ship_Stats.MaximumShields, 40},
         {Ship_Stats.Armour, 40},
         {Ship_Stats.Accuracy, 20},
         {Ship_Stats.Damage, 65},
@@ -14,8 +14,8 @@ Public Class destroyer
         {Ship_Stats.Drones, 0}
     }
     Public Shared Destroyer_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 6750},
-        {Galaxy.Produce.Gas, 5150}
+        {Galaxy.Produce.Resource, 3600},
+        {Galaxy.Produce.Gas, 800}
     }
 
 
@@ -26,6 +26,7 @@ Public Class destroyer
         For Each i In Destroyer_Costs
             Costs(i.Key) = Destroyer_Costs(i.Key)
         Next
+        Stats(Ship_Stats.MaximumShields) = Destroyer_Stats(Ship_Stats.MaximumShields)
         Type = Ship_Types.Destroyer
     End Sub
 

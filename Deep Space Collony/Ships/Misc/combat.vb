@@ -33,15 +33,15 @@ Public Class Combat
                 i.Update(True)
             Next
             Randomize()
-            Dim Defender As fleet = Fleets(Int((UBound(Fleets) + 1) * Rnd())) 'The defending fleet
-            Dim Attacker As fleet = Fleets(Int((UBound(Fleets) + 1) * Rnd())) 'The attacking fleet
+            Dim Defender As fleet = Fleets(Int(Fleets.Length * Rnd())) 'The defending fleet
+            Dim Attacker As fleet = Fleets(Int(Fleets.Length * Rnd())) 'The attacking fleet
             If Attacker.Friendly <> Defender.Friendly Then 'They're enemies
                 For Each i As ship In Attacker.Ships
-                    If i IsNot Nothing Then 'Its a ship
-                        If Defender.Ships.Length <> 0 Then 'Theres ships left
-                            Dim Target As ship = Defender.Ships(Int(UBound(Defender.Ships) * Rnd())) 'A ship in the defending fleet
-                            i.Attack(Target) 'Attack ship
-                        End If
+                    If Defender.Ships.Length <> 0 Then 'Theres ships left
+                        Dim Target As ship = Defender.Ships(Int(Defender.Ships.Length * Rnd())) 'A ship in the defending fleet
+                        i.Attack(Target) 'Attack ship
+                    Else
+                        Exit Sub
                     End If
                 Next
             End If

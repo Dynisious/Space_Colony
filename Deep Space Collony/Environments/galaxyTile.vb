@@ -13,7 +13,7 @@ Public Class galaxyTile
     End Enum
     Public Shared Zoom As ZoomLevels = ZoomLevels.Sector
 
-    Public Sub New(ByRef NParent As Galaxy, ByRef NReference As sector, ByVal NPosition As Point)
+    Public Sub New(ByRef NParent As Galaxy, ByVal NPosition As Point)
         P = NParent
         Position = NPosition
         b = New btnTile(Me)

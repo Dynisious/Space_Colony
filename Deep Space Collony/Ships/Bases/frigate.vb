@@ -14,7 +14,7 @@ Public Class frigate
         {Ship_Stats.Drones, 0}
     }
     Public Shared Frigate_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 3600},
+        {Galaxy.Produce.Resource, 1200},
         {Galaxy.Produce.Gas, 0}
     }
 
@@ -26,6 +26,7 @@ Public Class frigate
         For Each i In Frigate_Costs
             Costs(i.Key) = Frigate_Costs(i.Key)
         Next
+        Stats(Ship_Stats.MaximumShields) = Frigate_Stats(Ship_Stats.MaximumShields)
         Type = Ship_Types.Frigate
     End Sub
 

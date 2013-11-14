@@ -14,8 +14,8 @@ Public Class dreadnought
         {Ship_Stats.Drones, 5}
     }
     Public Shared Dreadnought_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 21060},
-        {Galaxy.Produce.Gas, 14400}
+        {Galaxy.Produce.Resource, 5500},
+        {Galaxy.Produce.Gas, 2000}
     }
 
 
@@ -26,6 +26,7 @@ Public Class dreadnought
         For Each i In Dreadnought_Costs
             Costs(i.Key) = Dreadnought_Costs(i.Key)
         Next
+        Stats(Ship_Stats.MaximumShields) = Dreadnought_Stats(Ship_Stats.MaximumShields)
         Type = Ship_Types.Dreadnought
     End Sub
 

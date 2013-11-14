@@ -34,6 +34,7 @@ Public Class Galaxy
 
     Public Sub New(ByRef NParent As Screen)
         P = NParent
+        RandomEvents.P = Me
         Music.Stream = My.Resources.Black_Vortex
         Music.PlayLooping()
         '-----Initialise the grid of sectors-----
@@ -114,16 +115,16 @@ Public Class Galaxy
         '-----Initialise the grid of tiles-----
         For X As Integer = 0 To 26
             For Y As Integer = 0 To 9
-                Tiles(X, Y) = New galaxyTile(Me, Sectors(X, Y), New Point(X, Y))
+                Tiles(X, Y) = New galaxyTile(Me, New Point(X, Y))
             Next
         Next
         For Each i As sector In Sectors
             If i IsNot Nothing Then
                 i.Graphic = Tiles(i.Position.X, i.Position.Y)
-                Tiles(i.Position.X, i.Position.Y).Reference = i
+                i.Graphic.Reference = i
                 For Each e As starSystem In i.Systems
                     If e IsNot Nothing Then
-                        e.Graphic = Tiles(i.Position.X, i.Position.Y)
+                        e.Graphic = Tiles(e.Position.X, e.Position.Y)
                     End If
                 Next
                 i.Graphic.Update()
@@ -159,14 +160,17 @@ Public Class Galaxy
 
         '-----Spawn Pirates-----
         TickCount = TickCount + 1
-        If Int(25 * Rnd()) = 0 And PirateCount < 7 Then 'There are less than 7 pirates
-            Dim X As Integer = Int(26 * Rnd())
-            Dim Y As Integer = Int(9 * Rnd())
-            If Sectors(X, Y) IsNot Nothing Then 'If its not empty
-                If Sectors(X, Y).Friendly = Allegence.Enemy Then 'If its an enemy tile
-                    Sectors(X, Y).Add_Fleet(New PirateFleet(Sectors(X, Y), TickCount, New Point(X, Y)))
+        If Int(300 * Rnd()) = 0 And PirateCount < 7 Then 'There are less than 7 pirates
+            Do Until True
+                Dim X As Integer = Int(27 * Rnd())
+                Dim Y As Integer = Int(10 * Rnd())
+                If Sectors(X, Y) IsNot Nothing Then 'If its not empty
+                    If Sectors(X, Y).Friendly = Allegence.Enemy Then 'If its an enemy tile
+                        Sectors(X, Y).Add_Fleet(New PirateFleet(Sectors(X, Y), TickCount, New Point(X, Y)))
+                        Exit Do
+                    End If
                 End If
-            End If
+            Loop
         End If
         '-----------------------
 
@@ -182,9 +186,9 @@ Public Class Galaxy
                 If GoOn = True Then
                     i.Update()
                 End If
-            End If
-            If Int(3600000 * Rnd()) = 0 Then
-                RandomEvents.Black_Hole(i)
+                If Int(3240000 * Rnd()) = 0 Then
+                    RandomEvents.Black_Hole(i)
+                End If
             End If
         Next
         P.UpdateTick()

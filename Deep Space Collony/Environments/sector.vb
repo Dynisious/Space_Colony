@@ -71,7 +71,6 @@ Public Class sector
 
     Public Overrides Sub Clicked(ByVal e As MouseEventArgs)
         If e.Button = MouseButtons.Right Then 'They want to Interact the starSystem
-
             '-------------------------------------------------
             galaxyTile.Zoom = galaxyTile.ZoomLevels.System
             For Each i As sector In P.Sectors
@@ -89,8 +88,8 @@ Public Class sector
             P.FleetToMove = Nothing
             P.MakingWormhole = Nothing
             P.AddingShips = Nothing
+            Exit Sub
             '-------------------------------------------------
-
         ElseIf e.Button = MouseButtons.Left And P.AddingShips = True Then
             If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
                 Dim Temp As New AddingShipsStep1(Fleets, Me)
@@ -325,14 +324,19 @@ Public Class sector
     End Sub
 
     Public Sub ZoomOut()
+        P.P.StatDisplay.Text = ""
         galaxyTile.Zoom = galaxyTile.ZoomLevels.Sector
         For Each i As starSystem In Systems
-            i.Graphic.Reference = Nothing
-            i.Graphic.Update()
+            If i IsNot Nothing Then
+                i.Graphic.Reference = Nothing
+                i.Graphic.Update()
+            End If
         Next
         For Each i As sector In P.Sectors
-            i.Graphic.Reference = i
-            i.Graphic.Update()
+            If i IsNot Nothing Then
+                i.Graphic.Reference = i
+                i.Graphic.Update()
+            End If
         Next
     End Sub
 

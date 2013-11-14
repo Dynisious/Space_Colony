@@ -26,6 +26,7 @@ Public Class bomber
         For Each i In Bomber_Costs
             Costs(i.Key) = Bomber_Costs(i.Key)
         Next
+        Stats(Ship_Stats.MaximumShields) = Bomber_Stats(Ship_Stats.MaximumShields)
         Type = Ship_Types.Bomber
     End Sub
 

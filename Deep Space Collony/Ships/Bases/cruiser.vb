@@ -14,8 +14,8 @@ Public Class cruiser
         {Ship_Stats.Drones, 3}
     }
     Public Shared Cruiser_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 14400},
-        {Galaxy.Produce.Gas, 9600}
+        {Galaxy.Produce.Resource, 4500},
+        {Galaxy.Produce.Gas, 1200}
     }
 
 
@@ -26,6 +26,7 @@ Public Class cruiser
         For Each i In Cruiser_Costs
             Costs(i.Key) = Cruiser_Costs(i.Key)
         Next
+        Stats(Ship_Stats.MaximumShields) = Cruiser_Stats(Ship_Stats.MaximumShields)
         Type = Ship_Types.Cruiser
     End Sub
 
