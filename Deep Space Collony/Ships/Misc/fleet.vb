@@ -69,7 +69,7 @@ Public Class fleet
             Next
             If GoOn = True Then 'Theres ships 
                 For Each i As ship In Ships
-                    i.Update()
+                    i.Update(InBattle)
                 Next
             Else 'Theres only drones
                 For Each i As ship In Ships

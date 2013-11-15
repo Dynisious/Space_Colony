@@ -62,13 +62,12 @@ Public MustInherit Class ship
         End If
     End Sub
 
-    Public Overridable Sub Update()
-        If Shields < Stats(Ship_Stats.MaximumShields) Then 'if the shields aren't full
-            Shields = Shields + 1
-        End If
-
-        If TickCount = 1 Then 'Its been two seconds
-            TickCount = 0
+    Public Overridable Sub Update(ByVal InBattle As Boolean)
+        If InBattle = True Then 'theres a battle
+            If Shields < Stats(Ship_Stats.MaximumShields) Then 'if the shields aren't full
+                Shields = Shields + 1
+            End If
+        Else 'Theres no battle
             If Health < 100 Then 'If the ship is damaged
                 Health = Health + 1
             End If

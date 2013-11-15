@@ -57,9 +57,15 @@ Public Class galaxyTile
             Reference.Clicked(e)
         Else
             P.P.StatDisplay.Text = ""
-            P.FleetToMove = Nothing
             P.MakingWormhole = Nothing
             P.AddingShips = Nothing
+            If P.FleetToMove IsNot Nothing Then
+                For Each i As wormhole In P.FleetToMove.P.Connections
+                    P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
+                    P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
+                Next
+                P.FleetToMove = Nothing
+            End If
         End If
     End Sub
 

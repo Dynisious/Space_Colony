@@ -245,23 +245,18 @@ Public Class sector
         End If
         '-------------------------
 
-        For Each i As wormhole In Connections
-            P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
-            P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
-        Next
+        If Object.ReferenceEquals(Nfleet, P.FleetToMove) Then
+            For Each i As wormhole In Connections
+                P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = False
+                P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
+            Next
+        End If
     End Sub
 
     Public Overrides Sub Update()
-        '-----Update fleets-----
-        If Fleets.Length <> 0 Then 'If there is a fleet
-            For Each i As fleet In Fleets
-                i.Update(False) 'Update the fleet
-            Next
-        End If
-        '-----------------------
 
         '-----Battle-----
-        If Equals(Battle, Nothing) = False Then 'Theres a battle
+        If Battle IsNot Nothing Then 'Theres a battle
             Battle.Update() 'Update the battle
             Friendly = Galaxy.Allegence.Neutral 'Reset the sectors allegence
             Dim Friendlies As Integer 'The number of friendly ships
@@ -282,6 +277,13 @@ Public Class sector
             End If
         ElseIf Fleets.Length <> 0 Then
             Friendly = Fleets(0).Friendly
+            '-----Update fleets-----
+            If Fleets.Length <> 0 Then 'If there is a fleet
+                For Each i As fleet In Fleets
+                    i.Update(False) 'Update the fleet
+                Next
+            End If
+            '-----------------------
         End If
         '----------------
 

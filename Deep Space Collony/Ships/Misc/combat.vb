@@ -9,6 +9,9 @@ Public Class Combat
         P = NParent
 
         For Each i As fleet In P.Fleets
+            For Each e As ship In i.Ships
+                e.Shields = e.Stats(ship.Ship_Stats.MaximumShields)
+            Next
             i.LaunchDrones()
         Next
     End Sub

@@ -76,7 +76,7 @@ Public Class Galaxy
             End If
         Next
         Sectors(0, 0).Add_Fleet(New fleet(Sectors(0, 0), New playerFighter, New Point(0, 0), Allegence.Friendly)) 'Make a new fleet with a cruiser
-        For i As Integer = 0 To 2
+        For i As Integer = 0 To 4
             Sectors(0, 0).Fleets(0).Add_Ship(New playerFrigate) 'Add two more cruisers to the fleet
         Next
         ProduceStores(Produce.Resource) = 400

@@ -19,8 +19,8 @@
         Type = Ship_Types.GuardianDrone
     End Sub
 
-    Public Overrides Sub Update()
-        MyBase.Update()
+    Public Overrides Sub Update(ByVal InBattle As Boolean)
+        MyBase.Update(InBattle)
         If P.P.Battle Is Nothing Then
             Kill_Ship()
         End If

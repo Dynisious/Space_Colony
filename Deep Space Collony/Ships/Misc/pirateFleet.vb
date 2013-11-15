@@ -48,11 +48,12 @@ Public Class PirateFleet
                 If i IsNot Nothing Then
                     If i.Friendly = Galaxy.Allegence.Neutral Then
                         GoOn = False
+                        Exit For
                     End If
                 End If
             Next
             If P.Battle IsNot Nothing Then
-                GoOn = False
+                Exit Sub
             End If
 
             If GoOn = True Then 'Move to a new sector
