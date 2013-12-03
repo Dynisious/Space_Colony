@@ -14,8 +14,8 @@ Public Class bomber
         {Ship_Stats.Drones, 1}
     }
     Public Shared Bomber_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 700},
-        {Galaxy.Produce.Gas, 400}
+        {Galaxy.Produce.Resource, 933},
+        {Galaxy.Produce.Gas, 533}
     }
 
 

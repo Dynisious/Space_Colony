@@ -10,6 +10,7 @@ Public Class sector
     Public Connections(-1) As wormhole 'The sectors that you can move to from here
     Public Battle As Combat
     Public Highlighted As Boolean = False
+    Public Checked As Boolean = False
     Public Info As String
 
     Public Sub New(ByRef NParent As Galaxy, ByVal NPosition As Point)
@@ -21,12 +22,18 @@ Public Class sector
         For X As Integer = 0 To 26
             For Y As Integer = 0 To 9
                 Randomize()
-                If Int(32 * Rnd()) = 0 Then 'Shouldn't it be Empty
+                If Int(43 * Rnd()) = 0 Then 'Shouldn't it be Empty
                     Systems(X, Y) = New starSystem(Me, New Point(X, Y))
                 End If
             Next
         Next
         '---------------------------------------------
+
+        '-----Check for issolation-----
+        If Connections.Length < 2 Then
+            P.Sectors(Position.X, Position.Y) = Nothing
+        End If
+        '------------------------------
     End Sub
 
     Public Sub Make_Connetions()
@@ -35,17 +42,17 @@ Public Class sector
         Dim YStart As Integer 'The starting y-int of the radius
         Dim YEnd As Integer 'The ending point of the y axis
         '-----Mark the starting point-----
-        For i As Integer = 0 To 4
+        For i As Integer = 0 To 2
             If Position.X - i >= 0 Then
                 XStart = Position.X - i 'Make the new x-int
             End If
-            If Position.X + i <= UBound(P.Sectors, 1) Then
+            If Position.X + i <= 26 Then
                 XEnd = Position.X + i 'Make the new XEnd
             End If
             If Position.Y - i >= 0 Then
                 YStart = Position.Y - i 'Make the new y-int
             End If
-            If Position.Y + i <= UBound(P.Sectors, 2) Then
+            If Position.Y + i <= 9 Then
                 YEnd = Position.Y + i 'Make the new YEnd
             End If
         Next
@@ -56,17 +63,26 @@ Public Class sector
             For Y As Integer = YStart To YEnd
                 If P.Sectors(X, Y) IsNot Nothing Then 'The sector isn't empty
                     ReDim Preserve Connections(Connections.Length) 'Add a blank space
-                    Connections(UBound(Connections)) = New wormhole(Me, New Point(X, Y)) 'Add the wormhole
+                    Connections(UBound(Connections)) = New wormhole(Me, New Point(X, Y), False) 'Add the wormhole
                 End If
             Next
         Next
         '--------------------------
+    End Sub
 
-        '-----Check for issolation-----
-        If Connections.Length < 2 Then
-            P.Sectors(Position.X, Position.Y) = Nothing
-        End If
-        '------------------------------
+    Public Sub Viable()
+        Checked = True
+        For X As Integer = Position.X - 4 To Position.X + 4
+            If X <= 0 And X >= 26 Then
+                For Y As Integer = Position.Y - 4 To Position.Y + 4
+                    If P.Sectors(X, Y) IsNot Nothing Then
+                        If P.Sectors(X, Y).Checked = False Then
+                            P.Sectors(X, Y).Viable()
+                        End If
+                    End If
+                Next
+            End If
+        Next
     End Sub
 
     Public Overrides Sub Clicked(ByVal e As MouseEventArgs)
@@ -101,7 +117,7 @@ Public Class sector
 
         ElseIf e.Button = MouseButtons.Left And P.MakingWormhole = True Then
             If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
-                Dim Temp As New ClosingWormholes(Me, Connections)
+                Dim Temp As New MakingWormholes(Me)
                 P.FleetToMove = Nothing
                 P.MakingWormhole = Nothing
                 P.AddingShips = Nothing
@@ -134,7 +150,7 @@ Public Class sector
                         Next
                         P.FleetToMove.P.Remove_Fleet(P.FleetToMove) 'Remove the old reference
                         Add_Fleet(P.FleetToMove) 'Add the new fleet
-                        P.FleetToMove.Position = Position 'Set the fleets new position
+                        P.FleetToMove.P.Position = Position 'Set the fleets new position
                     End If
                     P.FleetToMove = Nothing
                     P.MakingWormhole = Nothing
@@ -196,7 +212,7 @@ Public Class sector
     Public Sub Add_Fleet(ByRef NFleet As fleet)
         ReDim Preserve Fleets(Fleets.Length) 'Add an extra space
         Fleets(UBound(Fleets)) = NFleet 'Add the new fleet
-        NFleet.Position = Position 'Set the new position
+        NFleet.P.Position = Position 'Set the new position
         NFleet.P = Me 'Make me the parent
 
         If Friendly <> Galaxy.Allegence.Neutral And NFleet.Friendly <> Friendly Then 'Start a battle
@@ -251,6 +267,9 @@ Public Class sector
                 P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
             Next
         End If
+        For Each i As wormhole In Connections
+            i.Update()
+        Next
     End Sub
 
     Public Overrides Sub Update()
@@ -303,15 +322,15 @@ Public Class sector
         '-----Wormholes-----
         If Friendly <> Galaxy.Allegence.Friendly Then 'Its an enemy sector
             For Each i As wormhole In Connections
-                i.Closed = False
+                If i.Artificial = True Then
+                    i.Remove_Wormhole()
+                End If
             Next
         End If
 
-        If Equals(Connections(0), Nothing) = False Then 'There are wormholes
-            For Each i As wormhole In Connections
-                i.Update()
-            Next
-        End If
+        For Each i As wormhole In Connections
+            i.Update()
+        Next
         '-------------------
 
         If galaxyTile.Zoom = galaxyTile.ZoomLevels.System Then

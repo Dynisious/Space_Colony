@@ -69,7 +69,7 @@
                 fighter.Fighter_Costs(Galaxy.Produce.Resource) Then 'There's enough resource
                 P.P.ProduceStores(Galaxy.Produce.Resource) =
                     P.P.ProduceStores(Galaxy.Produce.Resource) - fighter.Fighter_Costs(Galaxy.Produce.Resource)
-                P.Add_Fleet(New fleet(P, New playerFighter(), P.Position, Galaxy.Allegence.Friendly))
+                P.Add_Fleet(New fleet(P, New playerFighter(), Galaxy.Allegence.Friendly))
                 Dim Temp As New AddingShipsStep2(P.Fleets(UBound(P.Fleets)), P)
                 Close()
             Else

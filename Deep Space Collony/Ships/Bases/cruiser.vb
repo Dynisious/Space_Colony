@@ -14,8 +14,8 @@ Public Class cruiser
         {Ship_Stats.Drones, 3}
     }
     Public Shared Cruiser_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 4500},
-        {Galaxy.Produce.Gas, 1200}
+        {Galaxy.Produce.Resource, 6000},
+        {Galaxy.Produce.Gas, 1600}
     }
 
 

@@ -108,6 +108,7 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Environments\artificialWormhole.vb" />
     <Compile Include="Environments\RandomEvents.vb" />
     <Compile Include="Ships\Bases\guardianDrone.vb" />
     <Compile Include="Ships\Misc\pirateFleet.vb" />
@@ -156,10 +157,10 @@
     <Compile Include="Forms\AddingShipsStep2.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ClosingWormholes.Designer.vb">
-      <DependentUpon>ClosingWormholes.vb</DependentUpon>
+    <Compile Include="Forms\MakingWormholes.Designer.vb">
+      <DependentUpon>MakingWormholes.vb</DependentUpon>
     </Compile>
-    <Compile Include="Forms\ClosingWormholes.vb">
+    <Compile Include="Forms\MakingWormholes.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\SelectingFleets.Designer.vb">
@@ -199,35 +200,6 @@
     </Compile>
     <Compile Include="Environments\sector.vb" />
     <Compile Include="Ships\Bases\frigate.vb" />
-    <Compile Include="Ships\Ship Upgrades\Advanced_Sighting_Computer.vb" />
-    <Compile Include="Ships\Ship Upgrades\Bio_Metal.vb" />
-    <Compile Include="Ships\Ship Upgrades\Bomb_AI.vb" />
-    <Compile Include="Ships\Ship Upgrades\Carpet_Bomb.vb" />
-    <Compile Include="Ships\Ship Upgrades\Combat_Thrusters.vb" />
-    <Compile Include="Ships\Ship Upgrades\Counter_Spin_Generators.vb" />
-    <Compile Include="Ships\Ship Upgrades\Crystaline_Plates.vb" />
-    <Compile Include="Ships\Ship Upgrades\Double_Energy_Layer.vb" />
-    <Compile Include="Ships\Ship Upgrades\Guided_Projectiles.vb" />
-    <Compile Include="Ships\Ship Upgrades\Magnetic_Armour.vb" />
-    <Compile Include="Ships\Ship Upgrades\Nuclear_Explosives.vb" />
-    <Compile Include="Ships\Ship Upgrades\Advanced_Plasma_Cannons.vb" />
-    <Compile Include="Ships\Ship Upgrades\Plasma_Injection.vb" />
-    <Compile Include="Ships\Ship Upgrades\Pulsation_Shielding.vb" />
-    <Compile Include="Ships\Ship Upgrades\Pulse_Shields.vb" />
-    <Compile Include="Ships\Ship Upgrades\Advanced_Rail_Gun.vb" />
-    <Compile Include="Ships\Ship Upgrades\Rapid_Chamber_System.vb" />
-    <Compile Include="Ships\Ship Upgrades\Repeater_Cannons.vb" />
-    <Compile Include="Ships\Ship Upgrades\Rotary_Cannons.vb" />
-    <Compile Include="Ships\Ship Upgrades\Scale_Plating.vb" />
-    <Compile Include="Ships\Ship Upgrades\Scatter_Shot.vb" />
-    <Compile Include="Ships\Ship Upgrades\Segmented_Projectiles.vb" />
-    <Compile Include="Ships\Ship Upgrades\Shaped_Charges.vb" />
-    <Compile Include="Ships\Ship Upgrades\Single_Case_Construction.vb" />
-    <Compile Include="Ships\Ship Upgrades\Streaker_Missiles.vb" />
-    <Compile Include="Ships\Ship Upgrades\Three_Point_Targeting.vb" />
-    <Compile Include="Ships\Ship Upgrades\Trident_Generator.vb" />
-    <Compile Include="Ships\Ship Upgrades\Turbine_Firing_Mechanism.vb" />
-    <Compile Include="Ships\Ship Upgrades\upgradeBase.vb" />
     <Compile Include="Ships\PirateShips\pirateBomber.vb" />
     <Compile Include="Ships\PirateShips\pirateCruiser.vb" />
     <Compile Include="Ships\PirateShips\pirateDestroyer.vb" />
@@ -245,8 +217,6 @@
     <Compile Include="Environments\Galaxy.vb" />
     <Compile Include="Environments\wormhole.vb" />
     <Compile Include="Environments\tutorialGalaxy.vb" />
-    <Compile Include="Ships\Ship Upgrades\Volley_Rockets.vb" />
-    <Compile Include="Ships\Ship Upgrades\Vortex_Shields.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Forms\Encylopedia.resx">
@@ -267,8 +237,8 @@
     <EmbeddedResource Include="Forms\AddingShipsStep2.resx">
       <DependentUpon>AddingShipsStep2.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ClosingWormholes.resx">
-      <DependentUpon>ClosingWormholes.vb</DependentUpon>
+    <EmbeddedResource Include="Forms\MakingWormholes.resx">
+      <DependentUpon>MakingWormholes.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Screen.resx">
       <DependentUpon>Screen.vb</DependentUpon>
@@ -325,7 +295,9 @@
   <ItemGroup>
     <None Include="Resources\Sleep_and_Then.wav" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Ships\Ship Upgrades\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

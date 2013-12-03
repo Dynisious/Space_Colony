@@ -128,7 +128,7 @@ Partial Class Screen
         Me.btnClosingHoles.Name = "btnClosingHoles"
         Me.btnClosingHoles.Size = New System.Drawing.Size(85, 38)
         Me.btnClosingHoles.TabIndex = 8
-        Me.btnClosingHoles.Text = "Close Wormhole"
+        Me.btnClosingHoles.Text = "Wormholes"
         Me.btnClosingHoles.UseVisualStyleBackColor = True
         '
         'Pause

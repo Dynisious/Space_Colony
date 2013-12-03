@@ -1,4 +1,7 @@
-﻿Public Class guardianDrone
+﻿Imports System.Runtime.Serialization.Formatters.Binary
+
+<Serializable()>
+Public Class guardianDrone
     Inherits ship
 
     Public Shared Guardian_Stats As New Dictionary(Of Ship_Stats, Integer) From {

@@ -14,7 +14,7 @@ Public Class frigate
         {Ship_Stats.Drones, 0}
     }
     Public Shared Frigate_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 1200},
+        {Galaxy.Produce.Resource, 1600},
         {Galaxy.Produce.Gas, 0}
     }
 

@@ -4,7 +4,8 @@
 Public Class Galaxy
     <NonSerialized()>
     Public WithEvents P As Screen 'The screen form for the game
-    Public Shared WithEvents Music As New System.Media.SoundPlayer
+    <NonSerialized()>
+    Public WithEvents Music As New System.Media.SoundPlayer
     Public Sectors(26, 9) As sector 'A grid of sectors inside the Galaxy
     Public Tiles(26, 9) As galaxyTile 'A grid of galaxyTiles
     <NonSerialized()>
@@ -67,17 +68,17 @@ Public Class Galaxy
             Sectors(0, 0).Friendly = Allegence.Friendly  'Make it owned by the player
         Else
             P.GameGalaxy = New Galaxy(P)
+            WorldTimer.Enabled = False
             Exit Sub
         End If
-        Sectors(0, 0).Friendly = Allegence.Friendly
         For Each i As starSystem In Sectors(0, 0).Systems
             If i IsNot Nothing Then 'The starSystem is not empty
                 i.Friendly = Allegence.Friendly 'Make it friendly
             End If
         Next
-        Sectors(0, 0).Add_Fleet(New fleet(Sectors(0, 0), New playerFighter, New Point(0, 0), Allegence.Friendly)) 'Make a new fleet with a cruiser
-        For i As Integer = 0 To 4
-            Sectors(0, 0).Fleets(0).Add_Ship(New playerFrigate) 'Add two more cruisers to the fleet
+        Sectors(0, 0).Add_Fleet(New fleet(Sectors(0, 0), New playerCruiser, Allegence.Friendly)) 'Make a new fleet with a cruiser
+        For i As Integer = 1 To 3
+            Sectors(0, 0).Fleets(0).Add_Ship(New playerFrigate) 'Add three frigates to the fleet
         Next
         ProduceStores(Produce.Resource) = 400
         ProduceStores(Produce.Gas) = 400
@@ -92,25 +93,41 @@ Public Class Galaxy
                 Sectors(i.Opening.X, i.Opening.Y).Make_Connetions()
             Next
             Sectors(26, 9).Friendly = Allegence.Enemy
-            For Each i As starSystem In Sectors(26, 9).Systems
-                If i IsNot Nothing Then
-                    i.Friendly = Allegence.Enemy
-                End If
-            Next
         Else
             P.GameGalaxy = New Galaxy(P)
+            WorldTimer.Enabled = False
             Exit Sub
         End If
-
-        Dim Pirate As New fleet(Sectors(26, 9), New dreadnought, New Point(26, 9), Allegence.Enemy)
+        For Each i As starSystem In Sectors(26, 9).Systems
+            If i IsNot Nothing Then
+                i.Friendly = Allegence.Enemy
+            End If
+        Next
+        Dim Pirate As New fleet(Sectors(26, 9), New dreadnought, Allegence.Enemy)
         For i As Integer = 0 To 5
             Pirate.Add_Ship(New destroyer)
         Next
         Sectors(26, 9).Add_Fleet(Pirate)
-        For i As Integer = 0 To 6
-            Sectors(26, 9).Add_Fleet(New PirateFleet(Sectors(26, 9), 0, New Point(26, 9)))
-        Next
         '-----------------------
+
+        '-----Check for issolation------
+        Sectors(0, 0).Viable() 'Start the chain at (0,0)
+        For Each i As sector In Sectors
+            If i IsNot Nothing Then
+                If i.Checked = False Then 'It is impossible to get to
+                    For Each e As starSystem In i.Systems
+                        e.P = Nothing 'Remove all references
+                    Next
+                    i = Nothing 'Remove it
+                End If
+            End If
+        Next
+        If Sectors(26, 9) Is Nothing Then 'There's no pirates
+            WorldTimer.Enabled = False
+            P.GameGalaxy = New Galaxy(P)
+            Exit Sub
+        End If
+        '-------------------------------
 
         '-----Initialise the grid of tiles-----
         For X As Integer = 0 To 26
@@ -139,38 +156,41 @@ Public Class Galaxy
         P.Window.Controls.Clear()
         For Each i As galaxyTile In Tiles
             i.b = New btnTile(i)
+            i.Update()
         Next
         WorldTimer = New Timer With {.Enabled = True, .Interval = 10}
     End Sub
 
     Private Sub Update() Handles WorldTimer.Tick
-        '-----Win or Lose-----
-        Dim GameWinCheck As Boolean = True 'Theres no more Enemies
-        Dim GameLoseCheck As Boolean = True 'Theres no more Friendlies
-        For Each i As sector In Sectors
-            If i IsNot Nothing Then
-                If i.Friendly <> Allegence.Friendly Then
-                    GameWinCheck = False 'Theres uncaptured areas
-                Else
-                    GameLoseCheck = False 'Theres Friendlies
-                End If
-            End If
-        Next
-        '-----------------
-
         '-----Spawn Pirates-----
         TickCount = TickCount + 1
-        If Int(300 * Rnd()) = 0 And PirateCount < 7 Then 'There are less than 7 pirates
-            Do Until True
-                Dim X As Integer = Int(27 * Rnd())
-                Dim Y As Integer = Int(10 * Rnd())
-                If Sectors(X, Y) IsNot Nothing Then 'If its not empty
-                    If Sectors(X, Y).Friendly = Allegence.Enemy Then 'If its an enemy tile
-                        Sectors(X, Y).Add_Fleet(New PirateFleet(Sectors(X, Y), TickCount, New Point(X, Y)))
-                        Exit Do
+        If Int(600 * Rnd()) = 0 And PirateCount < 7 Then 'There are less than 7 pirates
+            Dim PirateSecs(-1) As sector
+            Dim NeutralSecs(-1) As sector
+            Dim ExitSec As sector
+
+            For Each i As sector In Sectors
+                If i IsNot Nothing Then
+                    If i.Friendly = Allegence.Enemy Then
+                        ReDim Preserve PirateSecs(PirateSecs.Length)
+                        PirateSecs(UBound(PirateSecs)) = i
+                    ElseIf i.Friendly = Allegence.Neutral Then
+                        ReDim Preserve NeutralSecs(NeutralSecs.Length)
+                        NeutralSecs(UBound(NeutralSecs)) = i
                     End If
                 End If
-            Loop
+            Next
+
+            If Int(1000 * Rnd()) = 0 Then
+                ExitSec = NeutralSecs(Int(NeutralSecs.Length * Rnd()))
+                ExitSec.Add_Fleet(New PirateFleet(ExitSec, TickCount))
+            Else
+                ExitSec = PirateSecs(Int(PirateSecs.Length * Rnd()))
+                ExitSec.Add_Fleet(New PirateFleet(ExitSec, TickCount))
+            End If
+        End If
+        If Int(1000 * Rnd()) = 0 And PirateFleet.LongJumps < 7 Then
+            PirateFleet.LongJumps = PirateFleet.LongJumps + 1
         End If
         '-----------------------
 
@@ -194,6 +214,20 @@ Public Class Galaxy
         P.UpdateTick()
         '------------------------
 
+        '-----Win or Lose-----
+        Dim GameWinCheck As Boolean = True 'Theres no more Enemies
+        Dim GameLoseCheck As Boolean = True 'Theres no more Friendlies
+        For Each i As sector In Sectors
+            If i IsNot Nothing Then
+                If i.Friendly <> Allegence.Friendly Then
+                    GameWinCheck = False 'Theres uncaptured areas
+                ElseIf i.Friendly = Allegence.Friendly Then
+                    GameLoseCheck = False 'Theres Friendlies
+                End If
+            End If
+        Next
+        '-----------------
+
         If GameWinCheck = True Or GameLoseCheck = True Then 'Gameover
             P.Pause_Click(Me, New EventArgs)
             Dim Temp As New GameOver(P)
@@ -202,7 +236,7 @@ Public Class Galaxy
                 Temp.Text = "You Lost!"
             ElseIf GameWinCheck = True Then 'The player one
                 Temp.ForeColor = Color.LawnGreen
-                Temp.Text = "You One!"
+                Temp.Text = "You Won!"
             End If
         End If
     End Sub

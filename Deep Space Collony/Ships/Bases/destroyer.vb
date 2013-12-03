@@ -14,8 +14,8 @@ Public Class destroyer
         {Ship_Stats.Drones, 0}
     }
     Public Shared Destroyer_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 3600},
-        {Galaxy.Produce.Gas, 800}
+        {Galaxy.Produce.Resource, 4800},
+        {Galaxy.Produce.Gas, 1067}
     }
 
 

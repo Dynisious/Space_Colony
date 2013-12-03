@@ -59,7 +59,9 @@
             Temp = True
         End If
         For Each i As galaxyTile In GameGalaxy.Tiles
-            i.b.Enabled = Temp
+            If i IsNot Nothing Then
+                i.b.Enabled = Temp
+            End If
         Next
         GameGalaxy.WorldTimer.Enabled = Temp
         btnAddShips.Enabled = Temp

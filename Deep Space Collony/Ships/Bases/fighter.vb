@@ -13,7 +13,7 @@ Public Class fighter
         {Ship_Stats.Drones, 0}
     }
     Public Shared Fighter_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 600},
+        {Galaxy.Produce.Resource, 800},
         {Galaxy.Produce.Gas, 0}
     }
 

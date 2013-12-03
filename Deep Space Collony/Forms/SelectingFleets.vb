@@ -60,10 +60,8 @@
                                 f = FSelect
                             End If
                         Next
-                        If f.Closed = False Then
-                            i.P.P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = True
-                            i.P.P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
-                        End If
+                        i.P.P.Sectors(i.Opening.X, i.Opening.Y).Highlighted = True
+                        i.P.P.Sectors(i.Opening.X, i.Opening.Y).Graphic.Update()
                     Next
                 End If
                 P.P.P.P.Pause_Click(Me, New EventArgs)

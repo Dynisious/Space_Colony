@@ -7,13 +7,11 @@ Public Class fleet
     Public ShipCount As Integer
     Public DroneCount As Integer
     Public Friendly As Galaxy.Allegence
-    Public Position As Point
     Public TickCount As Integer
 
-    Public Sub New(ByRef NParent As sector, ByRef NShip As ship, ByVal NPosition As Point, ByVal NFriendly As Galaxy.Allegence)
+    Public Sub New(ByRef NParent As sector, ByRef NShip As ship, ByVal NFriendly As Galaxy.Allegence)
         P = NParent
         Add_Ship(NShip)
-        Position = NPosition
         Friendly = NFriendly
     End Sub
 
@@ -44,9 +42,6 @@ Public Class fleet
             Ships(i) = Ships(i + 1) 'Move the rest of the Ships back
         Next
         ReDim Preserve Ships(Ships.Length - 3) 'Remove the empty space and ship from the list
-        If ShipCount = 0 Then 'Theres no Ships
-            Kill()
-        End If
     End Sub
 
     Public Sub LaunchDrones()

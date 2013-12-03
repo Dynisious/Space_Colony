@@ -15,12 +15,12 @@ Public Class starSystem
     Private ReadOnly Discriptions As New Dictionary(Of Integer, String) From {
             {1, "A Sun and a few simple planets although some of them could" +
                 " provide valuble scientific reasearch; others appear sutable" +
-                " for crops" + Environment.NewLine + "Resource/min: 120" +
+                " for crops" + Environment.NewLine + "Resource/min: 60" +
                 Environment.NewLine + "Science points/min: 20"},
             {2, "Deep scans are detecting large metal deposits close to the " +
                 "surface. A mining colony here could be very " +
                 "profitable, plus I'm sure the science team could find some " +
-                "pretty rocks to test." + Environment.NewLine + "Resource/min: 120" +
+                "pretty rocks to test." + Environment.NewLine + "Resource/min: 60" +
                 Environment.NewLine + "Science points/min: 20"},
             {3, "Some of the planets here are populated with simple animal life. " +
                 "By Terra the scientists would have a field day and I'm sure the sh" +
@@ -29,18 +29,18 @@ Public Class starSystem
             {4, "This nebula, though small, is composed purely of aurum-caligo " +
                 "gas! oh what a find! This nebula could easily be harvested for " +
                 "a great turn out as it would require no refinement." +
-                Environment.NewLine + "Gas/min: 120"},
+                Environment.NewLine + "Gas/min: 60"},
             {5, "The observation deck is filled with the light this gas giant " +
                 "is throwing off. A small operation could turn " +
                 "this raw aurum gas into usable fuel. The tanks " +
                 "are looking a bit dry and a refuel would be appresiated." +
-                Environment.NewLine + "Gas/min: 120"},
+                Environment.NewLine + "Gas/min: 60"},
             {6, "Finding this cloud of aurum gas was terrorfying. A swirl" +
                 "ing purple vortex of light that would tear this ship appart." +
                 " I might call in a team; It's sad " +
                 "really that gas teams can go somewhere I " +
                 "wouldn't dare fly this grand war ship." + Environment.NewLine +
-                "Gas/min: 120"}
+                "Gas/min: 60"}
         }
     Public UpdateTick As Integer
     Public ScienceTick As Integer
@@ -51,7 +51,7 @@ Public Class starSystem
         Friendly = Galaxy.Allegence.Neutral
         '-----Set the Type-----
         Randomize()
-        If Int(6 * Rnd()) = 0 Then 'Should it be a Nebula
+        If Int(8 * Rnd()) = 0 Then 'Should it be a Nebula
             'Yes it should be a Nebula
             Type = SystemTypes.Nebula
             Discription = Discriptions(Int((3 * Rnd()) + 4))
@@ -65,15 +65,14 @@ Public Class starSystem
     End Sub
 
     Public Overrides Sub Clicked(ByVal e As MouseEventArgs)
-        If e.Button = MouseButtons.Left And e.Clicks = 2 Then 'Colonize the starSystem
-            If P.Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
-                If P.P.ProduceStores(Galaxy.Produce.Resource) >= 60 Then 'You have the supplies
-                    '-----Colonise-----
-                    P.P.ProduceStores(Galaxy.Produce.Resource) =
-                        P.P.ProduceStores(Galaxy.Produce.Resource) - 60 'Remove the resources
-                    Friendly = Galaxy.Allegence.Friendly 'Make player owned
-                    '------------------
-                End If
+        If e.Button = MouseButtons.Left And e.Clicks = 2 And P.Fleets.Length <> 0 And
+            P.Friendly = Galaxy.Allegence.Friendly Then 'there's a fleet and its player owned, Colonize the starSystem
+            If P.P.ProduceStores(Galaxy.Produce.Resource) >= 60 Then 'You have the supplies
+                '-----Colonise-----
+                P.P.ProduceStores(Galaxy.Produce.Resource) =
+                    P.P.ProduceStores(Galaxy.Produce.Resource) - 60 'Remove the resources
+                Friendly = Galaxy.Allegence.Friendly 'Make player owned
+                '------------------
             End If
         ElseIf e.Button = MouseButtons.Right Then 'Zoom out
             P.ZoomOut()
@@ -114,10 +113,10 @@ Public Class starSystem
         If Friendly = Galaxy.Allegence.Friendly Then 'Its player owned
             UpdateTick = UpdateTick + 1
             If UpdateTick = 100 Then 'If its been a second
-                UpdateTick = 0 'Reset the count
+                UpdateTick = 0
                 If Type = SystemTypes.Solar Then 'Its a Solar System
                     'Add resource
-                    P.P.ProduceStores(Galaxy.Produce.Resource) = P.P.ProduceStores(Galaxy.Produce.Resource) + 2
+                    P.P.ProduceStores(Galaxy.Produce.Resource) = P.P.ProduceStores(Galaxy.Produce.Resource) + 1
                     'Add Science
                     ScienceTick = ScienceTick + 1
                     If ScienceTick = 3 Then 'its been three seconds
@@ -125,7 +124,7 @@ Public Class starSystem
                     End If
                 Else 'Its a Nebula
                     'Add Gas
-                    P.P.ProduceStores(Galaxy.Produce.Gas) = P.P.ProduceStores(Galaxy.Produce.Gas) + 2
+                    P.P.ProduceStores(Galaxy.Produce.Gas) = P.P.ProduceStores(Galaxy.Produce.Gas) + 1
                 End If
             End If
         End If

@@ -34,9 +34,7 @@ Public MustInherit Class ship
         For i As Integer = 1 To Stats(Ship_Stats.Shots)
             Randomize()
             If Int((100 * Rnd()) + 1) <= Stats(Ship_Stats.Accuracy) Then 'Does it land the hit
-                If Equals(Target, Nothing) = False Then
-                    Target.Defend(Me)
-                End If
+                Target.Defend(Me)
             End If
         Next
     End Sub

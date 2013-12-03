@@ -3,9 +3,10 @@
 <Serializable()>
 Public Class PirateFleet
     Inherits fleet
+    Public Shared LongJumps As Integer
 
-    Public Sub New(ByRef NParent As sector, ByRef TickCount As Integer, ByVal NPosition As Point)
-        MyBase.New(NParent, New pirateFighter, NPosition, Galaxy.Allegence.Enemy)
+    Public Sub New(ByRef NParent As sector, ByRef TickCount As Integer)
+        MyBase.New(NParent, New pirateFighter, Galaxy.Allegence.Enemy)
         P.P.PirateCount = P.P.PirateCount + 1 'Add me to the count
 
         Dim NewShips As Integer = (Int(TickCount / 6000) + 1)
@@ -13,11 +14,8 @@ Public Class PirateFleet
             NewShips = 9
         End If
         For i As Integer = 0 To NewShips
-            If i > 19 Then
-                i = 19 'Make sure their aren't too many ships
-            End If
             Dim Type As Integer
-            Dim Temp As Integer = TickCount / 18000
+            Dim Temp As Integer = TickCount / 12000
             If Temp < 150 And Temp > 110 Then
                 Type = Int((Temp * Rnd()) + 1)
             ElseIf Temp < 110 Then
@@ -42,53 +40,72 @@ Public Class PirateFleet
     Public Overrides Sub Update(ByVal InBattle As Boolean)
         MyBase.Update(InBattle)
 
-        If TickCount = 0 Then
-            Dim GoOn As Boolean = True
-            For Each i As starSystem In P.Systems
+        If TickCount = 0 And InBattle = False Then
+            '-----Collonise-----
+            For Each i As starSystem In P.Systems 'Check systems
                 If i IsNot Nothing Then
-                    If i.Friendly = Galaxy.Allegence.Neutral Then
-                        GoOn = False
-                        Exit For
+                    If i.Friendly <> Galaxy.Allegence.Enemy Then 'Check its allegence
+                        i.Friendly = Galaxy.Allegence.Enemy 'Collonise
+                        Exit Sub
                     End If
                 End If
             Next
-            If P.Battle IsNot Nothing Then
-                Exit Sub
-            End If
-
-            If GoOn = True Then 'Move to a new sector
-                Dim MakeJump As Boolean = False
-                Do Until MakeJump = True
-                    Dim EntryHole As wormhole = P.Connections(Int(UBound(P.Connections) * Rnd()))  'The wormhole entrance
-                    Dim ExitHole As wormhole 'The wormhole exit
-                    Dim NewSec As sector = P.P.Sectors(EntryHole.Opening.X, EntryHole.Opening.Y) 'The new sector
-                    For Each i As wormhole In NewSec.Connections
-                        If i.Opening = P.Position Then
-                            ExitHole = i
-                        End If
-                    Next
-                    If ExitHole IsNot Nothing Then
-                        If ExitHole.Closed = False Then 'The wormhole is open
-                            If NewSec IsNot Nothing Then
-                                MakeJump = True
-                                P.Remove_Fleet(Me) 'Remove the old reference
-                                ExitHole.P.Add_Fleet(Me) 'Add the new reference
-                            End If
-                        End If
-                    End If
-                Loop
-            ElseIf GoOn = False And Int(4 * Rnd()) = 0 Then 'Colonise
-                Dim sys As starSystem
-                For Each i As starSystem In P.Systems
-                    If i IsNot Nothing Then
-                        If i.Friendly = Galaxy.Allegence.Neutral Then
-                            sys = i
-                            Exit For
-                        End If
+            '-------------------
+            If Int(3 * Rnd()) = 0 Then
+                '-----Jump-----
+                For Each i As wormhole In P.Connections 'Check wormholes
+                    If P.P.Sectors(i.Opening.X, i.Opening.Y).Friendly = Galaxy.Allegence.Neutral Then 'Theres an uncolonised sector
+                        Normal_Jump() 'Make jump
+                        Exit Sub
                     End If
                 Next
-                sys.Friendly = Galaxy.Allegence.Enemy
+                If Int(10 * Rnd()) = 0 Then
+                    Extended_Jump()
+                Else
+                    Normal_Jump()
+                End If
+                '--------------
             End If
+        End If
+    End Sub
+
+    Private Sub Normal_Jump()
+        Dim ExitPoint As Point = P.Connections(Int(P.Connections.Length * Rnd())).Opening
+        Dim NewSec As sector = P.P.Sectors(ExitPoint.X, ExitPoint.Y)
+        P.Remove_Fleet(Me)
+        NewSec.Add_Fleet(Me)
+    End Sub
+
+    Private Sub Extended_Jump()
+        If LongJumps > 0 Then
+            Dim Secs(-1) As sector
+
+            For X As Integer = P.Position.X - 4 To P.Position.X + 4
+                If X >= 0 And X <= 26 Then
+                    For Y As Integer = P.Position.Y - 4 To P.Position.Y + 4
+                        If Y >= 0 And Y <= 9 Then
+                            If P.P.Sectors(X, Y) IsNot Nothing Then
+                                If P.P.Sectors(X, Y).Friendly <> Galaxy.Allegence.Enemy Then
+                                    ReDim Preserve Secs(Secs.Length)
+                                    Secs(UBound(Secs)) = P.P.Sectors(X, Y)
+                                End If
+                            End If
+                        End If
+                    Next
+                End If
+            Next
+
+            If Secs.Length <> 0 Then
+                Dim ExitSec As sector = Secs(Int(Secs.Length * Rnd()))
+                ReDim Preserve P.Connections(P.Connections.Length)
+                P.Connections(UBound(P.Connections)) = New artificialWormhole(P, ExitSec.Position, True, Galaxy.Allegence.Enemy)
+                P.Remove_Fleet(Me)
+                ExitSec.Add_Fleet(Me)
+            Else
+                Normal_Jump()
+            End If
+        Else
+            Normal_Jump()
         End If
     End Sub
 

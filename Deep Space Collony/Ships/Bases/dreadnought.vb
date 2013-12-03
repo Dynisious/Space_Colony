@@ -14,8 +14,8 @@ Public Class dreadnought
         {Ship_Stats.Drones, 5}
     }
     Public Shared Dreadnought_Costs As New Dictionary(Of Galaxy.Produce, Integer) From {
-        {Galaxy.Produce.Resource, 5500},
-        {Galaxy.Produce.Gas, 2000}
+        {Galaxy.Produce.Resource, 7333},
+        {Galaxy.Produce.Gas, 2667}
     }
 
 
