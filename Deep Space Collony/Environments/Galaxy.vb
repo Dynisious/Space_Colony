@@ -116,7 +116,9 @@ Public Class Galaxy
             If i IsNot Nothing Then
                 If i.Checked = False Then 'It is impossible to get to
                     For Each e As starSystem In i.Systems
-                        e.P = Nothing 'Remove all references
+                        If e IsNot Nothing Then
+                            e.P = Nothing 'Remove all references
+                        End If
                     Next
                     i = Nothing 'Remove it
                 End If
